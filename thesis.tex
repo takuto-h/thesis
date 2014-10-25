@@ -76,6 +76,13 @@ CLOSはこのモデルに分類される．
 \label{fig:generic-functions}
 \end{figure}
 
+\begin{figure}
+\centering
+\includegraphics[width=7cm]{fig/environment-crop.pdf}
+\caption{環境にメソッドを直接格納するモデル}
+\label{fig:environment}
+\end{figure}
+
 \section{提案するオブジェクトシステム}
 
 従来のオブジェクトシステムの分類先である2つのモデルは，どちらもクラス名とメソッド名が決まれば
@@ -84,7 +91,7 @@ CLOSはこのモデルに分類される．
 共通している．
 
 提案するオブジェクトシステムはこのようなクラスや総称関数による入れ子構造を廃し，
-\textbf{環境にメソッドを直接格納する}モデルを採用する（TODO:図の挿入）．
+\textbf{環境にメソッドを直接格納する}モデルを採用する（図\ref{fig:environment}）．
 ここで環境は\textbf{クラス名とメソッド名の組}をキーとしてメソッドを格納する辞書である．
 
 このモデルの特徴は，メソッドの格納方式が一般的な変数の格納方式と類似していることである．
