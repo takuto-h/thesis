@@ -53,6 +53,15 @@
 メソッドを格納する辞書である．
 SmalltalkやRubyなどのオブジェクトシステムはこのモデルに分類される．
 
+
+\subsection{総称関数にメソッドを格納するモデル}
+
+総称関数にメソッドを格納するモデルでは環境に総称関数を格納し，総称関数にメソッドを格納する
+（図\ref{fig:generic-functions}）．
+ここで環境はメソッド名をキーとして総称関数を格納する辞書であり，総称関数はクラス名をキーとして
+メソッドを格納する辞書である．
+CLOSはこのモデルに分類される．
+
 \begin{figure}
 \centering
 \includegraphics[width=7cm]{fig/classes-crop.pdf}
@@ -60,13 +69,12 @@ SmalltalkやRubyなどのオブジェクトシステムはこのモデルに分�
 \label{fig:classes}
 \end{figure}
 
-\subsection{総称関数にメソッドを格納するモデル}
-
-総称関数にメソッドを格納するモデルでは環境に総称関数を格納し，総称関数にメソッドを格納する
-（TODO:図の挿入）．
-ここで環境はメソッド名をキーとして総称関数を格納する辞書であり，総称関数はクラス名をキーとして
-メソッドを格納する辞書である．
-CLOSはこのモデルに分類される．
+\begin{figure}
+\centering
+\includegraphics[width=7cm]{fig/generic-functions-crop.pdf}
+\caption{総称関数にメソッドを格納するモデル}
+\label{fig:generic-functions}
+\end{figure}
 
 \section{提案するオブジェクトシステム}
 
