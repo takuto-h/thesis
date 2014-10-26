@@ -1,6 +1,7 @@
 % withpage: ページ番号をつける (著者確認用)
 % english: 英語原稿用フォーマット
-\documentclass{ipsjprosym}
+%\documentclass{ipsjprosym}
+\documentclass[withpage]{ipsjprosym}  % TODO:withpageの削除
 %\documentclass[withpage,english]{ipsjprosym}
 
 \usepackage[dvipdfmx]{graphicx}
@@ -143,13 +144,27 @@ end
 
 \section{今後の課題}
 
-\subsection{モデルの拡張}
+\subsection{多重継承}
 
-\subsubsection{多重継承}
+Suzuは多重継承の代替機構としてTraitsを用いているが，
+Suzuはオブジェクトがただ1つのクラス名を持つという仕様だが，複数のクラス名を持つよう拡張する
+こともできる．
 
-\subsubsection{多重ディスパッチ}
+
+\subsection{多重ディスパッチ}
+
+\begin{itemize}
+\item 
+\end{itemize}
 
 \subsection{メソッド呼び出しの最適化}
+
+\begin{itemize}
+\item （TODO:マンデルブロ集合の計算にかかった時間を記載？）
+\item グローバルキャッシュは使えない
+\item インラインキャッシュが有効
+\item メソッドは仮引数にも指定できるので値ではなく格納位置の指標をキャッシュする必要がある
+\end{itemize}
 
 \section{結論}
 
@@ -157,17 +172,17 @@ end
 
 本提案はDSLの記述や既存のオブジェクトシステムの整理という面において有用である
 
-% \begin{acknowledgment}
-% 謝辞が必要であれば，ここに書く．
-% \end{acknowledgment}
+%\begin{acknowledgment}
+%謝辞が必要であれば，ここに書く．
+%\end{acknowledgment}
 
 % BibTeX を使用する場合 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{ipsjsort}
 \bibliography{thesis}
 
 % BibTeX を使用しない場合
-% \begin{thebibliography}{9}
-% \bibitem{latex} 奥村晴彦, 黒木裕介: \textbf{LaTeX2e美文書作成入門}. 技術評論社, 2013.
-% \end{thebibliography}
+%\begin{thebibliography}{9}
+%\bibitem{latex} 奥村晴彦, 黒木裕介: \textbf{LaTeX2e美文書作成入門}. 技術評論社, 2013.
+%\end{thebibliography}
 
 \end{document}
