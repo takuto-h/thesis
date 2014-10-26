@@ -20,7 +20,17 @@
 
 \begin{abstract}
 %[概要（400字程度）]
-TODO:構成を決めた後全体を要約する
+従来のオブジェクトシステムはクラスにメソッドを格納するモデルと総称関数にメソッドを格納する
+モデルとに分類されたが，そのどちらにも属さない，環境にメソッドを直接格納するモデルを持つ
+オブジェクトシステムを提案した．
+特徴は変数に対して行えるあらゆる操作がメソッドに対しても行えるようになることである．
+プログラミング言語Suzuを用いてこの特徴を生かした言語内DSLを作成し，提案する
+オブジェクトシステムの有用性を示した．
+オブジェクト指向プログラミングにおける既存の概念の整理にも役立った．
+今後はより実用性を意識した拡張や効率的な実装について考えていくことが課題である．
+あああああああああああああああああああああああああああああああああああああああああ
+ああああああああああああああああああああああああああああああああああああああああああ
+ああああああああああああああああああああああああああああああああああああ
 \end{abstract}
 
 \begin{jkeyword}
@@ -65,27 +75,6 @@ SmalltalkやRubyなどのオブジェクトシステムはこのモデルに分�
 メソッドを格納する辞書である．
 単一ディスパッチに限定したCLOSはこのモデルに分類される．
 
-\begin{figure}
-\centering
-\includegraphics[width=7cm]{fig/classes-crop.pdf}
-\caption{クラスにメソッドを格納するモデル}
-\label{fig:classes}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=7cm]{fig/generic-functions-crop.pdf}
-\caption{総称関数にメソッドを格納するモデル}
-\label{fig:generic-functions}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=7cm]{fig/environment-crop.pdf}
-\caption{環境にメソッドを直接格納するモデル}
-\label{fig:environment}
-\end{figure}
-
 \section{提案するオブジェクトシステム}
 
 従来のオブジェクトシステムの分類先である2つのモデルは，どちらもクラス名とメソッド名が決まれば
@@ -107,6 +96,27 @@ SmalltalkやRubyなどのオブジェクトシステムはこのモデルに分�
 インポート，仮引数やパターンマッチングのパターンとしての指定などが挙げられる．
 \ref{sec:implementation}節では提案するオブジェクトシステムを搭載した独自の
 プログラミング言語Suzuを用いて，この特徴を生かした実際のプログラム例を示す．
+
+\begin{figure}
+\centering
+\includegraphics[width=7cm]{fig/classes-crop.pdf}
+\caption{クラスにメソッドを格納するモデル}
+\label{fig:classes}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=7cm]{fig/generic-functions-crop.pdf}
+\caption{総称関数にメソッドを格納するモデル}
+\label{fig:generic-functions}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=7cm]{fig/environment-crop.pdf}
+\caption{環境にメソッドを直接格納するモデル}
+\label{fig:environment}
+\end{figure}
 
 \section{実装：プログラミング言語Suzu}
 \label{sec:implementation}
