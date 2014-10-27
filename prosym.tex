@@ -143,16 +143,54 @@ end
 
 \subsubsection{PEGパーザコンビネータ}
 
-\section{既存研究との比較}
+\section{関連研究}
 
 Suzuのオブジェクトシステムについて，従来のオブジェクトシステムに対しこれと似た柔軟性を
 与えようとする取り組みや，構造上の類似性を持つ概念との比較を行う．
 
+\subsection{ContextJ}
+
+ContextJ\cite{AppeltauerMalte:2011}は，文脈指向プログラミングにおけるlayerという
+概念に基づいたJavaの拡張言語である．
+layerを切り替えるによりメソッドの定義を切り替えることができる．
+
+layerは重ねられるという点でSuzuの環境と類似している．しかしながら，メソッドの定義が
+クラスの内部でしか行えないという点で柔軟性に欠ける．
+
+\subsection{GluonJ}
+
+GluonJ\cite{Chiba:2010:MMC:1869459.1869503}は，Javaでアスペクト指向
+プログラミングを行うためのシステムである．
+Glueと呼ばれるクラスを定義することによって，既存のクラスについてメソッドを再定義することが
+できる．
+
+クラスの外部でメソッドが再定義できるという点でSuzuのオブジェクトシステムと類似しているが，
+Suzuと違い定義を局所的に有効化・無効化する仕組みを持たない．
+
 \subsection{Classboxes}
+
+Classboxes\cite{Bergel:2005:CCV:1646591.1646599}は，可視性を制御しつつクラスを
+拡張できるシステムである．
+メソッドの再定義の範囲をClassboxというモジュール内に制限することができる．
+
+SuzuはClassboxのようなクラス専用の特殊なモジュールを提供することなく，変数を扱うのと
+同じモジュールシステムによってメソッドの再定義の範囲を制御できる．
+また，Classboxはダイナミックスコープだが，Suzuのモジュールはレキシカルスコープである．
+このためSuzuはlocal rebindingをサポートしない．
 
 \subsection{Refinements}
 
+Refinements\cite{Maeda:2013}は，プログラミング言語Rubyに導入されたClassboxesと
+類似する機構である．
+Refinementsはレキシカルスコープであり，local rebindingをサポートしない点で
+Suzuのモジュールシステムにより近い．
+
+しかしながら，Refinementsはメソッド定義の可視性をファイル単位でしか制御できない．
+Suzuのオブジェクトシステムはより細かいブロック単位で可視性を制御することが可能である．
+
 \subsection{MethodShells}
+
+
 
 \subsection{拡張メソッド}
 
