@@ -120,28 +120,7 @@ SmalltalkやRubyなどのオブジェクトシステムはこのモデルに分�
 \section{実装：プログラミング言語Suzu}
 \label{sec:implementation}
 
-提案する手法の有用性を実証するため，独自に設計したプログラミング言語Suzuを実装した．
-Suzuは，クラス・コンストラクタ・セッター・ゲッター・メソッドといったオブジェクト指向プログラミングにおける
-種々の概念に加え，トレイトやユーザ定義演算子，ラベル付き引数，ブロック付き関数呼び出し，
-限定継続などの機構を搭載している．これらの機構が，オブジェクトシステムの利点を生かし，
-PEGパーザコンビネータのようなドメイン特化言語を作成する際に有用であることを示す．
 
-\subsection{シンタックス}
-
-\begin{quote}
-\small
-\begin{verbatim}
-class <class> = <ctor>:
-  [mutable] <field>*
-end
-\end{verbatim}
-\end{quote}
-
-\subsection{セマンティクス}
-
-\subsection{プログラム例}
-
-\subsubsection{PEGパーザコンビネータ}
 
 \section{関連研究}
 
