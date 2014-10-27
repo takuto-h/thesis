@@ -180,7 +180,25 @@ write_line("{0}, {1}", d.x, d.y)
   //=> 7, 10
 \end{verbatim}
 \end{quote}
-メソッドは変数と同じように\verb|let|を用いても定義できる．
+
+Suzuのオブジェクトシステムは環境にメソッドを格納するため，ローカル環境にメソッドを定義する
+ことが可能だ．
+ここで言うローカル環境とは，ブロック（制御構文でインデントを行う部分），関数，
+モジュールといったあらゆる局所的なスコープのことである．
+\begin{quote}
+\begin{verbatim}
+def Vector#m(self):
+  write_line("global")
+end
+begin:
+  def Vector#m(self):
+    write_line("local")
+  end
+  d.m  //=> local
+end
+d.m  //=> global
+\end{verbatim}
+\end{quote}
 
 
 
