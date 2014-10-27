@@ -6,6 +6,8 @@
 \usepackage[dvipdfmx]{graphicx}
 \usepackage{latexsym}
 
+\usepackage{listings}
+
 \begin{document}
 
 % Title, Author %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -286,7 +288,54 @@ let C#n = S(C)::(C#m)
 \end{verbatim}
 \end{quote}
 
-\subsection{プログラム例}
+\subsection{プログラム例：PEGパーザコンビネータ}
+
+Suzuの有用性を示す例として，PEGパーザコンビネータライブラリを作成した．
+ソースコードは付録として\ref{sec:peg-source}節に記載している．
+
+このライブラリを用いると，パーザを言語内DSL（Domain Specific Language）として簡単に
+記述することができる．
+例えば，言語$\{a^n b^n c^n:n\ge1\}$のパーザは以下のようにして書ける．
+なお\verb|p|はデバッグ用の出力関数である．
+
+\begin{quote}
+\begin{verbatim}
+let s = begin:
+  open PEG::New()
+  "S" <- and(nt_ref("A") &+
+             not(char('b')))
+      &+ one_or_more(char('a'))
+      &+ nt_ref("B")
+      &+ not(char('c'))
+  "A" <- char('a')
+      &+ zero_or_one(nt_ref("A"))
+      &+ char('b')
+  "B" <- char('b')
+      &+ zero_or_one(nt_ref("B"))
+      &+ char('c')
+  nt_ref("S")
+end
+p(PEG::parse(s, ""))
+  //=> Failure()
+p(PEG::parse(s, "abc"))
+  //=> Success(...)
+p(PEG::parse(s, "ab"))
+  //=> Failure()
+p(PEG::parse(s, "aaabbbccc"))
+  //=> Success(...)
+p(PEG::parse(s, "aabbbccc"))
+  //=> Failure()
+\end{verbatim}
+\end{quote}
+
+パーザを定義する際はまず新しいスコープで\verb|PEG::New|を呼び出し\verb|open|する．
+これによりコンビネータ関数やメソッドがインポートされる．
+例えば\verb|nt_ref|は非終端記号を参照するコンビネータである．
+
+\verb|String#(<-)|は新しい非終端記号を定義する演算子であり．既存の
+\verb|String|クラスにこのスコープでのみ有効な新たなメソッドとして定義されている．
+このように，Suzuのオブジェクトシステムは特定のスコープでのみ有効なメソッドを定義
+できることで，モジュラリティの高い言語内DSLの作成を容易にしている．
 
 \section{関連研究}
 
@@ -434,6 +483,180 @@ Suzuはメソッドのローカル定義を許すため，同じクラス名と�
 %\begin{acknowledgment}
 %謝辞が必要であれば，ここに書く．
 %\end{acknowledgment}
+
+\appendix
+
+\section{PEGパーザコンビネータライブラリのソースコード}
+\label{sec:peg-source}
+
+\begin{lstlisting}[basicstyle=\tiny\ttfamily, breaklines=true]
+module PEG:
+  class Expr:
+    def MkExpr(proc)
+  end
+
+  class Result:
+    def Success(pos, value)
+    def Failure()
+  end
+
+  def parse(MkExpr(expr), str):
+    expr(str, 0, Hash::create(16))
+  end
+
+  trait New():
+    let nonterms = Hash::create(16)
+    
+    def def_nt(name, MkExpr(expr)):
+      nonterms[name] = expr
+    end
+
+    def char(c):
+      MkExpr^(str, pos, caches):
+        if(pos < String::length(str) && str[pos] == c):
+          Success(pos + 1, c)
+        else:
+          Failure()
+        end
+      end
+    end
+
+    def string(s):
+      let len = String::length(s)
+      MkExpr^(str, pos, caches):
+        if(pos + len <= String::length(str) && String::sub(str, pos, len) == s):
+          Success(pos + len, s)
+        else:
+          Failure()
+        end
+      end
+    end
+
+    def char_set(cs):
+      MkExpr^(str, pos, caches):
+        if(pos < String::length(str) && String::contain?(cs, str[pos])):
+          Success(pos + 1, str[pos])
+        else:
+          Failure()
+        end
+      end
+    end
+
+    def nt_ref(name):
+      MkExpr^(str, pos, caches):
+        match(Hash::get(caches, (name, pos))):
+        case(Some(result)):
+          result
+        case(None()):
+          let result = nonterms[name](str, pos, caches)
+          caches[(name, pos)] = result
+          result
+        end
+      end
+    end
+
+    let fail = MkExpr^(str, pos, caches):
+      Failure()
+    end
+
+    let no_op = MkExpr^(str, pos, caches):
+      Success(pos, ())
+    end
+
+    def seq(MkExpr(expr1), MkExpr(expr2)):
+      MkExpr^(str, pos, caches):
+        match(expr1(str, pos, caches)):
+        case(Success(pos, value)):
+          expr2(str, pos, caches)
+        case(Failure()):
+          Failure()
+        end
+      end
+    end
+
+    def alt(MkExpr(expr1), MkExpr(expr2)):
+      MkExpr^(str, pos, caches):
+        match(expr1(str, pos, caches)):
+        case(Success(pos, value)):
+          Success(pos, value)
+        case(Failure()):
+          expr2(str, pos, caches)
+        end
+      end
+    end
+
+    def zero_or_more(MkExpr(expr)):
+      MkExpr^(str, pos, caches):
+        def loop(rev_values, pos):
+          match(expr(str, pos, caches)):
+          case(Success(pos, value)):
+            loop([value, *rev_values], pos)
+          case(Failure()):
+            Success(pos, List::rev(rev_values))
+          end
+        end
+        loop([], pos)
+      end
+    end
+
+    def not(MkExpr(expr)):
+      MkExpr^(str, pos, caches):
+        match(expr(str, pos, caches)):
+        case(Success(pos, value)):
+          Failure()
+        case(Failure()):
+          Success(pos, ())
+        end
+      end
+    end
+
+    def return(value):
+      MkExpr^(str, pos, caches):
+        Success(pos, value)
+      end
+    end
+
+    def bind(MkExpr(expr), proc):
+      MkExpr^(str, pos, caches):
+        match(expr(str, pos, caches)):
+        case(Success(pos, value)):
+          let MkExpr(expr) = proc(value)
+          expr(str, pos, caches)
+        case(Failure()):
+          Failure()
+        end
+      end
+    end
+
+    def one_or_more(expr):
+      bind(expr)^(value):
+        bind(zero_or_more(expr))^(values):
+          return([value, *values])
+        end
+      end
+    end
+
+    def zero_or_one(expr):
+      alt(expr, no_op)
+    end
+
+    def and(expr):
+      not(not(expr))
+    end
+
+    let String::C#(<-) = def_nt
+    let Expr#(&+) = seq
+    let Expr#(|+) = alt
+
+    export def_nt, char, string, char_set, nt_ref, fail, no_op, seq, alt, 
+    zero_or_more, not
+    export return, bind, one_or_more, zero_or_one, and
+    export String::C#(<-), Expr#(&+), Expr#(|+)
+  end
+
+  export Success, Failure, parse, New
+end
+\end{lstlisting}
 
 % BibTeX を使用する場合 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{ipsjsort}
