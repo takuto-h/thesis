@@ -7,5 +7,5 @@
 *.log
 *.synctex.gz
 *.xbb
-thesis.pdf
+*.pdf
 .~lock.*
