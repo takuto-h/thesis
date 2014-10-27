@@ -200,6 +200,49 @@ d.m  //=> global
 \end{verbatim}
 \end{quote}
 
+Suzuのモジュールは，他の言語における変数のようにメソッドを個別にエクスポートできる．
+\begin{quote}
+\begin{verbatim}
+module A:
+  class C = ...
+    ...
+  end
+  def f(...):
+    ...
+  end
+  def C#m(...):
+    ...
+  end
+  def C#n(...):
+    ...
+  end
+  export f, C#m
+end
+\end{verbatim}
+\end{quote}
+上の例ではモジュール\verb|A|は関数\verb|f|とメソッド\verb|C#m|をエクスポートするが，
+\verb|C#n|はエクスポートしない．エクスポートされた変数を参照するには\verb|A::f|のようにする．
+
+モジュールは局所的に\verb|open|することができる．
+モジュールを\verb|open|するとエクスポートされている変数やメソッドがそのスコープで
+直接定義されたようにインポートすることができる．
+また，\verb|except|キーワードを用いてインポートの対象から除外することもできる．
+\begin{quote}
+\begin{verbatim}
+module B:
+  ...
+  export f, g, C, C#m, C#n
+end
+begin:
+  open B except g, C#n
+  ...
+end
+\end{verbatim}
+\end{quote}
+上の例では\verb|begin|から\verb|end|までのスコープへ，
+モジュール\verb|B|でエクスポートされているもののうち\verb|g|と\verb|C#n|を除いて
+インポートを行う．
+
 
 
 \section{関連研究}
