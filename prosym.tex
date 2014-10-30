@@ -484,12 +484,28 @@ Suzuはメソッドのローカル定義を許すため，同じクラス名と�
 %謝辞が必要であれば，ここに書く．
 %\end{acknowledgment}
 
+% BibTeX を使用する場合 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{ipsjsort}
+\bibliography{prosym}
+
+% BibTeX を使用しない場合
+%\begin{thebibliography}{9}
+%\bibitem{latex} 奥村晴彦, 黒木裕介: \textbf{LaTeX2e美文書作成入門}. 技術評論社, 
+%2013.
+%\end{thebibliography}
+
+\onecolumn
+
 \appendix
 
 \section{PEGパーザコンビネータライブラリのソースコード}
 \label{sec:peg-source}
 
-\begin{lstlisting}[basicstyle=\tiny\ttfamily, breaklines=true]
+\begin{lstlisting}[
+  basicstyle=\scriptsize\ttfamily,
+  breaklines=true,
+  lineskip=-2.4ex,
+  ]
 module PEG:
   class Expr:
     def MkExpr(proc)
@@ -648,8 +664,8 @@ module PEG:
     let Expr#(&+) = seq
     let Expr#(|+) = alt
 
-    export def_nt, char, string, char_set, nt_ref, fail, no_op, seq, alt, 
-    zero_or_more, not
+    export def_nt, char, string, char_set, nt_ref, fail, no_op
+    export seq, alt, zero_or_more, not
     export return, bind, one_or_more, zero_or_one, and
     export String::C#(<-), Expr#(&+), Expr#(|+)
   end
@@ -657,14 +673,5 @@ module PEG:
   export Success, Failure, parse, New
 end
 \end{lstlisting}
-
-% BibTeX を使用する場合 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\bibliographystyle{ipsjsort}
-\bibliography{prosym}
-
-% BibTeX を使用しない場合
-%\begin{thebibliography}{9}
-%\bibitem{latex} 奥村晴彦, 黒木裕介: \textbf{LaTeX2e美文書作成入門}. 技術評論社, 2013.
-%\end{thebibliography}
 
 \end{document}
