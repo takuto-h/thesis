@@ -249,8 +249,8 @@ end
 モジュール\verb|B|でエクスポートされているもののうち\verb|g|と\verb|C#n|を除いて
 インポートを行う．
 
-Suzuは継承機構を持たず，実装の再利用はTraits\cite{Scharli:2003}を用いて行う．
-ただし，SuzuのTraitはそのオブジェクトシステムに適合するよう他の言語と比べて多少
+Suzuは継承機構を持たず，実装の再利用はトレイト\cite{Scharli:2003}を用いて行う．
+ただし，Suzuのトレイトはそのオブジェクトシステムに適合するよう他の言語と比べて多少
 趣の異なるものとなっている．
 \begin{quote}
 \begin{verbatim}
@@ -269,7 +269,7 @@ trait T(C, C#m, C#n):
 end
 \end{verbatim}
 \end{quote}
-Traitは\textbf{クラスやメソッドを受け取ってモジュールを返す関数}として表現される．
+トレイトは\textbf{クラスやメソッドを受け取ってモジュールを返す関数}として表現される．
 使用する側は以下のようにする．
 \begin{quote}
 \begin{verbatim}
@@ -278,9 +278,9 @@ open T(E, E#m, E#n)
 \end{verbatim}
 \end{quote}
 これにより，\verb|D#o|，\verb|D#p|，\verb|E#o|，\verb|E#p|が定義される．
-Trait同士の加算は単に\verb|open|を並べればよい．メソッドの減算は\verb|except|を用いる．
+トレイト同士の加算は単に\verb|open|を並べればよい．メソッドの減算は\verb|except|を用いる．
 メソッドのリネームは\verb|except|に\verb|let|を用いた個別のインポートを組み合わせる．
-例えばTrait \verb|S|によって定義されるメソッド\verb|m|を\verb|n|にリネームしたい場合，
+例えばトレイト \verb|S|によって定義されるメソッド\verb|m|を\verb|n|にリネームしたい場合，
 以下のようにする．
 \begin{quote}
 \begin{verbatim}
@@ -399,7 +399,7 @@ MixJuice\cite{Ichisugi:2002}は，必要に応じ重ねあわせられる複数�
 
 \subsection{継承機構}
 
-Suzuは継承機構を持たず，Traitsによって実装の再利用を行う．
+Suzuは継承機構を持たず，トレイトによって実装の再利用を行う．
 継承機構を持たないことによって生じる不都合については今後検討していく必要がある．
 
 もしSuzuに継承機構を追加するとしてもそれほど複雑にはならない．
