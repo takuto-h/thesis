@@ -164,13 +164,13 @@ end
 \end{verbatim}
 \end{quote}
 \verb|^(n):|から\verb|end|までの部分は引数\verb|n|を受け取って\verb|end|までの
-式を実行する関数リテラルである．\verb|^(n){ ... }|と書くこともできる．
+式を評価する関数リテラルである．\verb|^(n){ ... }|と書くこともできる．
 
 関数リテラルは関数呼び出しの後ろに続けて書くことで追加の引数として高階関数に渡すことができる．
 例えば
 \begin{quote}
 \begin{verbatim}
-List::find(lst)^(n):
+find(lst)^(n):
   n > 0
 end
 \end{verbatim}
@@ -178,12 +178,12 @@ end
 は
 \begin{quote}
 \begin{verbatim}
-List::find(lst, ^(n){ n > 0 })
+find(lst, ^(n){ n > 0 })
 \end{verbatim}
 \end{quote}
 と等価である．
 
-\verb|begin|は新たなスコープを導入し\verb|end|までの式を実行する．
+\verb|begin|は新たなスコープを導入し\verb|end|までの式を評価する．
 \begin{quote}
 \begin{verbatim}
 let str = "global"
