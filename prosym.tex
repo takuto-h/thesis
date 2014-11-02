@@ -199,8 +199,9 @@ p(str)  //=> "global"
 
 \subsection{オブジェクトシステムの解説}
 
-Suzuは\ref{sec:proposal}節で提示したモデルを素朴に実装している．
-例えばクラス名とメソッド名の組は\verb|C#m|と書く．\verb|C|はクラス名，\verb|m|は
+ここでは\ref{sec:proposal}節で提示したモデルのSuzuにおける具体的な実装を述べる．
+
+クラス名とメソッド名の組は\verb|C#m|と書く．\verb|C|はクラス名，\verb|m|は
 メソッド名である．
 
 クラス定義は以下のようにして行う．
@@ -213,7 +214,7 @@ end
 \end{quote}
 これにより，クラス\verb|Vector|とそのコンストラクタ\verb|MkVector|が定義される．
 
-メソッドはクラスは別に以下のように定義する．
+メソッドは以下のようにクラスとは独立して定義する．
 \begin{quote}
 \begin{verbatim}
 def Vector#add(MkVector(x1, y1),
@@ -222,11 +223,12 @@ def Vector#add(MkVector(x1, y1),
 end
 \end{verbatim}
 \end{quote}
-通常の関数定義における変数名をクラス名とメソッド名の組に置き換えた形となっている．
+これは通常の関数定義における変数名をクラス名とメソッド名の組に置き換えた形となっている．
 変数と同様\verb|let|を用いた書き方も可能である．
 
 メソッドは\verb|obj.m(arg1, arg2)|のようにして呼び出す．
-メソッドが呼び出される際は第1引数として呼び出しの対象となったオブジェクト（レシーバ）が渡される．
+メソッドとして呼び出される関数には第1引数として\verb|obj|，第2・第3引数として\verb|arg1|，
+\verb|arg2|が渡される．
 \begin{quote}
 \begin{verbatim}
 let a = MkVector(1, 2)
@@ -242,24 +244,26 @@ p(a + b)  //=> MkVector(4, 6)
 \end{verbatim}
 \end{quote}
 
-Suzuのオブジェクトシステムは環境にメソッドを格納するため，ローカル環境にメソッドを定義する
-ことが可能だ．
-ここで言うローカル環境とは，ブロック（制御構文でインデントを行う部分），関数，
-モジュールといったあらゆる局所的なスコープのことである．
+Suzuは\ref{sec:proposal}節で述べた環境にメソッドを直接格納するモデルを採用しているため，
+ネストしたスコープの内側にメソッドを定義することで，ローカル変数に対応するローカルメソッドを
+定義できる．
 \begin{quote}
 \begin{verbatim}
+let v = MkVector(5, 6)
 def Vector#m(self):
-  write_line("global")
+  p("global")
 end
 begin:
   def Vector#m(self):
-    write_line("local")
+    p("local")
   end
-  d.m  //=> local
+  v.m  //=> "local"
 end
-d.m  //=> global
+v.m  //=> "global"
 \end{verbatim}
 \end{quote}
+このように，メソッドの探索は内側のスコープから順に行われるため，メソッドを変数のように
+シャドーイングすることが可能である．
 
 \subsection{その他の特徴}
 
