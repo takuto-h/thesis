@@ -197,7 +197,7 @@ p(str)  //=> "global"
 一般に，\verb|:|と\verb|end|（または\verb|{|と\verb|}|）で囲まれた箇所には
 新たなスコープが導入される．
 
-\subsection{オブジェクトシステムの解説}
+\subsection{オブジェクトシステム}
 
 ここでは\ref{sec:proposal}節で提示したモデルのSuzuにおける具体的な実装を述べる．
 
@@ -265,15 +265,12 @@ v.m  //=> "global"
 このように，メソッドの探索は内側のスコープから順に行われるため，メソッドを変数のように
 シャドーイングすることが可能である．
 
-\subsection{その他の特徴}
+\subsection{モジュールとトレイト}
 
-Suzuのモジュールは，他の言語における変数のようにメソッドを個別にエクスポートできる．
+Suzuのモジュールは他の言語における変数のようにメソッドを個別にエクスポートできる．
 \begin{quote}
 \begin{verbatim}
 module A:
-  class C = ...
-    ...
-  end
   def f(...):
     ...
   end
@@ -287,10 +284,12 @@ module A:
 end
 \end{verbatim}
 \end{quote}
-上の例ではモジュール\verb|A|は関数\verb|f|とメソッド\verb|C#m|をエクスポートするが，
-\verb|C#n|はエクスポートしない．エクスポートされた変数を参照するには\verb|A::f|のようにする．
+上の例ではモジュール\verb|A|は変数\verb|f|とメソッド\verb|C#m|をエクスポートするが，
+\verb|C#n|はエクスポートしない．
+エクスポートされた変数やメソッドは\verb|::|を用いて，\verb|A::f|，\verb|A::(C#m)|
+のように参照できる．
 
-モジュールは局所的に\verb|open|することができる．
+モジュールは\verb|open|キーワードを用いて\verb|open|することができる．
 モジュールを\verb|open|するとエクスポートされている変数やメソッドがそのスコープで
 直接定義されたようにインポートすることができる．
 また，\verb|except|キーワードを用いてインポートの対象から除外することもできる．
@@ -298,7 +297,7 @@ end
 \begin{verbatim}
 module B:
   ...
-  export f, g, C, C#m, C#n
+  export f, g, C#m, C#n
 end
 begin:
   open B except g, C#n
@@ -306,7 +305,7 @@ begin:
 end
 \end{verbatim}
 \end{quote}
-上の例では\verb|begin|から\verb|end|までのスコープへ，
+上の例では\verb|begin|から\verb|end|までのスコープで，
 モジュール\verb|B|でエクスポートされているもののうち\verb|g|と\verb|C#n|を除いて
 インポートを行う．
 
@@ -338,7 +337,10 @@ open T(D, D#m, D#n)
 open T(E, E#m, E#n)
 \end{verbatim}
 \end{quote}
-これにより，\verb|D#o|，\verb|D#p|，\verb|E#o|，\verb|E#p|が定義される．
+トレイトは既存のクラスとメソッドを受け取って新たなメソッドが定義されたモジュールを生成する．
+これを\verb|open|することでメソッドがそのスコープで有効になる．
+この例では，\verb|D#o|，\verb|D#p|，\verb|E#o|，\verb|E#p|が新たに定義される．
+
 トレイト同士の加算は単に\verb|open|を並べればよい．メソッドの減算は\verb|except|を用いる．
 メソッドのリネームは\verb|except|に\verb|let|を用いた個別のインポートを組み合わせる．
 例えばトレイト \verb|S|によって定義されるメソッド\verb|m|を\verb|n|にリネームしたい場合，
