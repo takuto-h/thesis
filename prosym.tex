@@ -129,6 +129,8 @@ SmalltalkやRubyといった言語のオブジェクトシステムはこのモ�
 
 \subsection{基本的な文法}
 
+
+
 \subsection{オブジェクトシステムの解説}
 
 \subsection{その他の特徴}
@@ -297,13 +299,19 @@ let C#n = S(C)::(C#m)
 
 \subsection{プログラム例：PEGパーザコンビネータ}
 
-Suzuの有用性を示す例として，PEGパーザコンビネータライブラリを作成した．
-ソースコードは付録として\ref{sec:peg-source}節に記載している．
+Suzuの有用性を示すプログラム例として，PEGパーザコンビネータライブラリを作成した．
+ソースコードは付録の\ref{sec:peg-source}節に記載している．
 
-このライブラリを用いると，パーザを言語内DSLとして簡単に記述することができる．
-例えば，言語$\{a^n b^n c^n:n\ge1\}$のパーザは以下のようにして書ける．
-なお\verb|p|はデバッグ用の出力関数である．
-
+このライブラリを用いると，パーザを言語内DSLとして簡潔に記述することができる．
+例えば，文脈自由でない言語$\{a^n b^n c^n:n\ge1\}$を表すPEG
+\begin{quote}
+\begin{verbatim}
+S <- &(A !'b') 'a'+ B !'c'
+A <- 'a' A? 'b'
+B <- 'b' B? 'c'
+\end{verbatim}
+\end{quote}
+のパーザは，\verb|PEG::New|を使用して以下のように書ける．
 \begin{quote}
 \begin{verbatim}
 let s = begin:
@@ -321,6 +329,16 @@ let s = begin:
       &+ char('c')
   nt_ref("S")
 end
+\end{verbatim}
+\end{quote}
+\verb|PEG::New|の呼び出しの戻り値を\verb|open|することで，文法定義のための関数群が
+現在のスコープにインポートされる．
+例えば，\verb|(<-)|は非終端記号の定義，\verb|nt_ref|は非終端記号の参照，
+\verb|(&+)|は連接，\verb/(|+)/は選択，\verb|and|は肯定先読み，\verb|not|は
+否定先読みである．
+パーザは\verb|PEG::parse|を使用して実行できる．
+\begin{quote}
+\begin{verbatim}
 p(PEG::parse(s, ""))
   //=> Failure()
 p(PEG::parse(s, "abc"))
@@ -334,14 +352,13 @@ p(PEG::parse(s, "aabbbccc"))
 \end{verbatim}
 \end{quote}
 
-パーザを定義する際はまず新しいスコープで\verb|PEG::New|を呼び出し\verb|open|する．
-これによりコンビネータ関数やメソッドがインポートされる．
-例えば\verb|nt_ref|は非終端記号を参照するコンビネータである．
+このライブラリは，\textbf{既存のデータ型に対して新たな演算子をローカルに定義できる}という
+Suzuの特徴を生かしている．
+演算子\verb|(<-)|の正体はメソッド\verb|String#(<-)|であり，スコープを限定した上で
+既存の文字列クラス\verb|String|に対し新たに定義されている．
 
-\verb|String#(<-)|は新しい非終端記号を定義する演算子であり．既存の
-\verb|String|クラスにこのスコープでのみ有効な新たなメソッドとして定義されている．
 このように，Suzuのオブジェクトシステムは特定のスコープでのみ有効なメソッドを定義
-できることで，モジュラリティの高い言語内DSLの作成を容易にしている．
+できることで，モジュール性の高い言語内DSLの作成を可能にしている．
 
 \section{関連研究}
 
