@@ -129,6 +129,76 @@ SmalltalkやRubyといった言語のオブジェクトシステムはこのモ�
 
 \subsection{基本的な文法}
 
+\verb|//|から行末まではコメントである．
+以降，\verb|//=>|に続くコメントはプログラムの出力を表すものとする．
+
+変数を定義するには\verb|let x = 123|のようにする．
+ここでは変数\verb|x|に整数値\verb|123|を代入している．
+
+関数呼び出しは\verb|p(x)|のようにする．
+ここでは関数\verb|p|を引数\verb|x|で呼び出している．
+なお，\verb|p|はSuzuのデバッグ用出力関数である．
+
+関数定義は以下のようにする．
+\begin{quote}
+\begin{verbatim}
+def fac(n):
+  if(n == 0):
+    1
+  else:
+    n * fac(n - 1)
+  end
+end
+\end{verbatim}
+\end{quote}
+これは以下のコードと意味的に等価である．
+\begin{quote}
+\begin{verbatim}
+let fac = ^(n):
+  if(n == 0):
+    1
+  else:
+    n * fac(n - 1)
+  end
+end
+\end{verbatim}
+\end{quote}
+\verb|^(n):|から\verb|end|までの部分は引数\verb|n|を受け取って\verb|end|までの
+式を実行する関数リテラルである．\verb|^(n){ ... }|と書くこともできる．
+
+関数リテラルは関数呼び出しの後ろに続けて書くことで追加の引数として高階関数に渡すことができる．
+例えば
+\begin{quote}
+\begin{verbatim}
+List::find(lst)^(n):
+  n > 0
+end
+\end{verbatim}
+\end{quote}
+は
+\begin{quote}
+\begin{verbatim}
+List::find(lst, ^(n){ n > 0 })
+\end{verbatim}
+\end{quote}
+と等価である．
+
+\verb|begin|は新たなスコープを導入し\verb|end|までの式を実行する．
+\begin{quote}
+\begin{verbatim}
+let str = "global"
+begin:
+  let str = "local"
+  p(str)  //=> "local"
+end
+p(str)  //=> "global"
+\end{verbatim}
+\end{quote}
+一般に，\verb|:|と\verb|end|（または\verb|{|と\verb|}|）で囲まれた箇所には
+新たなスコープが導入される．
+
+\subsection{オブジェクトシステムの解説}
+
 クラス定義は以下のようにして行う．
 \begin{quote}
 \begin{verbatim}
@@ -160,8 +230,6 @@ write_line("{0}, {1}", a.x, a.y)
 メソッド呼び出し\verb|a.x|によってメソッド\verb|Vector#x|が呼び出され，
 フィールド\verb|x|の値が返り，\verb|1|が出力される．
 同様に\verb|y|の値\verb|2|も出力される．
-
-\subsection{オブジェクトシステムの解説}
 
 メソッドは以下のように定義する．
 \begin{quote}
