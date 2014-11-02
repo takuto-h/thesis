@@ -129,14 +129,6 @@ SmalltalkやRubyといった言語のオブジェクトシステムはこのモ�
 
 \subsection{基本的な文法}
 
-
-
-\subsection{オブジェクトシステムの解説}
-
-\subsection{その他の特徴}
-
-\subsection{Suzuの概要}
-
 クラス定義は以下のようにして行う．
 \begin{quote}
 \begin{verbatim}
@@ -168,6 +160,8 @@ write_line("{0}, {1}", a.x, a.y)
 メソッド呼び出し\verb|a.x|によってメソッド\verb|Vector#x|が呼び出され，
 フィールド\verb|x|の値が返り，\verb|1|が出力される．
 同様に\verb|y|の値\verb|2|も出力される．
+
+\subsection{オブジェクトシステムの解説}
 
 メソッドは以下のように定義する．
 \begin{quote}
@@ -213,6 +207,8 @@ end
 d.m  //=> global
 \end{verbatim}
 \end{quote}
+
+\subsection{その他の特徴}
 
 Suzuのモジュールは，他の言語における変数のようにメソッドを個別にエクスポートできる．
 \begin{quote}
