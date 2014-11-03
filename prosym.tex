@@ -102,21 +102,21 @@ SmalltalkやRubyといった言語のオブジェクトシステムはこのモ�
 
 \begin{figure}
 \centering
-\includegraphics[width=7cm]{fig/classes-crop.pdf}
+\includegraphics[width=6.5cm]{fig/classes-crop.pdf}
 \caption{クラスにメソッドを格納するモデル}
 \label{fig:classes}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=7cm]{fig/generic-functions-crop.pdf}
+\includegraphics[width=6.5cm]{fig/generic-functions-crop.pdf}
 \caption{総称関数にメソッドを格納するモデル}
 \label{fig:generic-functions}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=7cm]{fig/environment-crop.pdf}
+\includegraphics[width=6.5cm]{fig/environment-crop.pdf}
 \caption{環境にメソッドを直接格納するモデル}
 \label{fig:environment}
 \end{figure}
@@ -265,6 +265,21 @@ v.m  //=> "global"
 \end{quote}
 このように，メソッドの探索は内側のスコープから順に行われるため，メソッドを変数のように
 シャドーイングすることが可能である．
+
+メソッド呼び出しの手順を図に表わすと図\ref{fig:method-call}のようになる．
+\verb|a.f(...)|というメソッド呼び出しは以下の3ステップを経て実行される．
+\begin{enumerate}
+\item \verb|a|からクラス名\verb|A|を取り出してメソッド名\verb|f|と組にする
+\item 組をキーとして環境をルックアップしメソッド\verb|<method>|を発見
+\item 第一引数に\verb|a|を追加し\verb|<method>|を呼び出す
+\end{enumerate}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=6.5cm]{fig/method-call-crop.pdf}
+	\caption{メソッド呼び出しの手順}
+	\label{fig:method-call}
+\end{figure}
 
 \subsection{モジュールとトレイト}
 
