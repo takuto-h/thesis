@@ -375,7 +375,7 @@ Suzuの有用性を示すプログラム例として，PEGパーザコンビネ�
 ソースコードは付録の\ref{sec:peg-source}節に記載している．
 
 このライブラリを用いると，パーザを言語内DSLとして簡潔に記述することができる．
-例えば，文脈自由でない言語$\{a^n b^n c^n:n\ge1\}$を表すPEG
+例えば，文脈自由でない言語$\{a^n b^n c^n \mid n \ge 1\}$を表すPEG
 \begin{quote}
 \begin{verbatim}
 S <- &(A !'b') 'a'+ B !'c'
