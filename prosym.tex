@@ -27,10 +27,10 @@
 提案する．
 クラスや総称関数といった枠を廃し，クラス名とメソッド名の組をキーとして環境にメソッドを直接格納する．
 これにより変数に対して行えるあらゆる操作がメソッドに対しても自然に行えるようになり，従来の方式に比べ
-シンプルな仕組みでより柔軟なオブジェクト指向プログラミングが可能となる．
-提案する手法の有用性を実証するため，このオブジェクトシステムを搭載する独自言語Suzuの
-処理系を実装した．
-これが実際に言語内DSL（Domain Specific Language）の作成に有用であることを示す．
+シンプルな仕組みで柔軟なオブジェクト指向プログラミングが可能となる．
+提案する手法の有用性を実証するため，このオブジェクトシステムを搭載する独自言語Suzuの処理系を
+実装した．
+Suzuの特徴を生かすプログラム例として言語内DSL（Domain Specific Language）を挙げる．
 従来のオブジェクトシステムにおける類似した概念等との関連についても議論する．
 \end{abstract}
 
@@ -65,6 +65,27 @@
 多重ディスパッチ（複数のオブジェクトに基づきメソッドを決定する方式）へのモデルの拡張については
 \ref{sec:multiple-dispatch}節で検討する．
 
+\begin{figure}
+\centering
+\includegraphics[width=6.5cm]{fig/classes-crop.pdf}
+\caption{クラスにメソッドを格納するモデル}
+\label{fig:classes}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=6.5cm]{fig/generic-functions-crop.pdf}
+\caption{総称関数にメソッドを格納するモデル}
+\label{fig:generic-functions}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=6.5cm]{fig/environment-crop.pdf}
+\caption{環境にメソッドを直接格納するモデル}
+\label{fig:environment}
+\end{figure}
+
 \subsection{クラスにメソッドを格納するモデル}
 \label{sec:classes}
 
@@ -86,8 +107,8 @@ SmalltalkやRubyといった言語のオブジェクトシステムはこのモ�
 \section{提案するオブジェクトシステム}
 \label{sec:proposal}
 
-従来のオブジェクトシステムの分類先である2つのモデルは，どちらもクラス名とメソッド名が決まれば
-メソッドが一意に定まるという特徴を持つ．
+従来のオブジェクトシステムの分類先である2つのモデルでは，どちらもクラス名とメソッド名が決まれば
+メソッドが一意に定まることが要請されている．
 また，環境という辞書の中にクラスあるいは総称関数という辞書が入れ子になっている構造も
 共通している．
 
@@ -100,33 +121,13 @@ SmalltalkやRubyといった言語のオブジェクトシステムはこのモ�
 キーとして環境に格納される．
 
 これはすなわち，「変数名」を「クラス名とメソッド名の組」に置き換えることで，
-\textbf{変数に対して行えるあらゆる操作がメソッドに対しても行える}ということである．
+\textbf{変数に対して行えるあらゆる操作がメソッドに対しても自然に行える（自然な意味付けが可能である）}
+ということである．
 具体的には，ローカル変数に対応する\textbf{ローカルメソッド}の定義，シャドーイング，
 モジュールからのエクスポート・インポート，仮引数やパターンマッチングのパターンとしての指定などが
 挙げられる．
 \ref{sec:implementation}節では提案するオブジェクトシステムを搭載した独自の
 プログラミング言語Suzuを用いて，この特徴を生かした実際のプログラム例を示す．
-
-\begin{figure}
-\centering
-\includegraphics[width=6.5cm]{fig/classes-crop.pdf}
-\caption{クラスにメソッドを格納するモデル}
-\label{fig:classes}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=6.5cm]{fig/generic-functions-crop.pdf}
-\caption{総称関数にメソッドを格納するモデル}
-\label{fig:generic-functions}
-\end{figure}
-
-\begin{figure}
-\centering
-\includegraphics[width=6.5cm]{fig/environment-crop.pdf}
-\caption{環境にメソッドを直接格納するモデル}
-\label{fig:environment}
-\end{figure}
 
 \section{実装：プログラミング言語Suzu}
 \label{sec:implementation}
