@@ -9,3 +9,5 @@
 *.xbb
 *.pdf
 .~lock.*
+*.lof
+*.toc
