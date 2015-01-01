@@ -32,7 +32,7 @@
 \setlength{\evensidemargin}{0.1in} 
 \setlength{\topmargin}{0in}
 \setlength{\textwidth}{6in} 
-%\setlength{\textheight}{10.1in}
+%\setlengthここに序論を書く．{\textheight}{10.1in}
 \setlength{\parskip}{0em}
 \setlength{\topsep}{0em}
 
@@ -44,8 +44,7 @@
 
 %% タイトル
 %% 【注意】タイトルの最後に\\ を入れるとエラーになります
-\title{\Underline{Containerlessなメソッド定義モデルに基づく\\
-オブジェクト指向プログラミング言語Suzu}}
+\title{\Underline{Containerless：オブジェクトシステムの新しいとらえ方}}
 %% 著者
 \author{林 拓人}
 %% 指導教員
@@ -92,10 +91,14 @@
 
 \chapter{序論}
 
-オブジェクト指向プログラミング
+オブジェクトシステムとは，\textbf{オブジェクト指向プログラミング}
+\cite{Stroustrup:1988:OP:624569.624721}を支援する
+プログラミング言語の機構である．
 
 
 \chapter{従来のオブジェクトシステム}
+
+従来のオブジェクトシステム
 
 ここで従来のオブジェクトシステムについて述べる．
 
@@ -117,6 +120,11 @@ Common Lisp，Dylan
 \label{figure:sample}
 \end{figure}
 
+\chapter{落ち穂拾い}
+
+\begin{enumerate}
+\item プロトタイプベース
+\end{enumerate}
 
 \chapter{結論}
 
@@ -133,7 +141,7 @@ Common Lisp，Dylan
 
 %% 参考文献に jbibtex を使う場合
 \bibliographystyle{junsrt}
-\bibliography{prosym}
+\bibliography{thesis}
 %% [compile] jbibtex sample; platex sample; platex sample;
 
 %% 参考文献を直接ファイルに含めて書く場合
