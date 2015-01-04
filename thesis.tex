@@ -23,7 +23,7 @@
 %% 参考：dvipdfm 日本語版
 %% http://hamilcar.phys.kyushu-u.ac.jp/~hirata/dvipdfm/
 
-\usepackage{hyperref}
+\usepackage[bookmarksnumbered=true]{hyperref}
 \usepackage{pxjahyper}
 
 \usepackage{times} % use Times Font instead of Computer Modern
@@ -35,7 +35,7 @@
 \setlength{\evensidemargin}{0.1in} 
 \setlength{\topmargin}{0in}
 \setlength{\textwidth}{6in} 
-%\setlengthここに序論を書く．{\textheight}{10.1in}
+%\setlength{\textheight}{10.1in}
 \setlength{\parskip}{0em}
 \setlength{\topsep}{0em}
 
@@ -106,9 +106,7 @@
 
 \chapter{従来のオブジェクトシステム}
 
-従来のオブジェクトシステム
-
-ここで従来のオブジェクトシステムについて述べる．
+本章ではクラスを用いてメソッドディスパッチをする従来のオブジェクトシステムをモデル化する．
 
 \section{クラスにメソッドを定義するモデル}
 
@@ -131,7 +129,9 @@ Common Lisp，Dylan
 \chapter{落ち穂拾い}
 
 \begin{enumerate}
-\item プロトタイプベース
+\item プロトタイプベースの方が動的
+\item 静的型検査は型クラスみたいにしてできそう
+\item Clojureのマルチメソッドはオブジェクトシステムからポリモーフィズムだけを抽出したもの
 \end{enumerate}
 
 \chapter{結論}
