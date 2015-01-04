@@ -7,7 +7,7 @@
 % PC環境や、LaTeX環境の設定によっては漢字コードや改行コードを
 % 変更する必要があります。
 %%
-\documentclass[a4paper,11pt]{jreport}
+\documentclass[a4paper,11pt,dvipdfmx]{jreport}
 
 %%【PostScript, JPEG, PNG等の画像の貼り込み】
 %% 利用するパッケージを選んでコメントアウトしてください。
@@ -19,9 +19,13 @@
 %% dvipdfm を使う場合(dvi->pdfを直接生成する場合)
 %\usepackage[dvipdfm]{color,graphicx}
 %% dvipdfm を使ってPDFの「しおり」を付ける場合
-%\usepackage[dvipdfm,bookmarks=true,bookmarksnumbered=true,bookmarkstype=toc]{hyperref}
+%\usepackage[dvipdfm,bookmarks=true,bookmarksnumbered=true,bookmarkstype=toc]
+%{hyperref}
 %% 参考：dvipdfm 日本語版
 %% http://hamilcar.phys.kyushu-u.ac.jp/~hirata/dvipdfm/
+
+\usepackage{hyperref}
+\usepackage{pxjahyper}
 
 \usepackage{times} % use Times Font instead of Computer Modern
 
@@ -119,7 +123,7 @@ Common Lisp，Dylan
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=3cm]{sample.eps}
+\includegraphics[width=3cm]{fig/environment-crop.pdf}
 %\psfig{file=sample.eps,scale=0.6}
 %\epsfile{file=sample.eps,scale=0.6}
 \end{center}
