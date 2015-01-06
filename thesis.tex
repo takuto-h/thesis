@@ -112,25 +112,49 @@
 本章では従来のオブジェクトシステムのうち，オブジェクトの\textbf{クラス}を用いてメソッドディスパッチを
 行うものについてモデル化する．
 
+クラスを用いてメソッドディスパッチを行う従来のオブジェクトシステムをメソッド定義の方式に着目してモデル化すると，
+次の2つのモデルに分類することができる．
+\begin{itemize}
+	\item クラスにメソッドを定義するモデル
+	\item 総称関数にメソッドを定義するモデル
+\end{itemize}
+それぞれのモデルについて解説していく．
+
 \section{クラスにメソッドを定義するモデル}
 
-C++，Java，Smalltalk，Ruby
+Smalltalk，C++，Java，Rubyなどの言語に組み込まれているオブジェクトシステムでは，クラスに所属させる形で
+メソッドを定義する．
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=10cm]{fig/trees_class-crop.pdf}
+	\caption{クラスにメソッドを定義するモデル}
+	\label{figure:class-model}
+\end{figure}
 
 \section{総称関数にメソッドを定義するモデル}
 
-Common Lisp，Dylan
+Common Lisp，Dylanなどの言語に組み込まれているオブジェクトシステムでは，クラスではなく\textbf{総称関数に}
+所属させる形でメソッドを定義する．
+
+図\ref{figure:gf-model}
 
 \begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=3cm]{fig/environment-crop.pdf}
-%\psfig{file=sample.eps,scale=0.6}
-%\epsfile{file=sample.eps,scale=0.6}
-\end{center}
-\caption{図の例}
-\label{figure:sample}
+	\centering
+	\includegraphics[width=10cm]{fig/trees_gf-crop.pdf}
+	\caption{総称関数にメソッドを定義するモデル}
+	\label{figure:gf-model}
 \end{figure}
 
 \chapter{提案するオブジェクトシステム}
+
+\begin{figure}[htbp]
+	\centering
+	\includegraphics[width=7cm]{fig/trees_containerless-crop.pdf}
+	\caption{環境にメソッドを直接定義するモデル}
+	\label{figure:containerlsss-model}
+\end{figure}
+
 
 \chapter{実装：プログラミング言語Suzu}
 
