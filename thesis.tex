@@ -60,6 +60,32 @@
 %\majorfield{情報システム主専攻}
 %\majorfield{知能情報メディア主専攻}
 
+\makeatletter%% プリアンブルで定義する場合は必須
+
+%% (j)report・(j)book クラスの場合
+%% 
+\renewenvironment{thebibliography}[1]% 再定義
+{\chapter*{\bibname\@mkboth{\bibname}{\bibname}}%
+	\addcontentsline{toc}{chapter}{\numberline{}\bibname}% この行追加
+	\list{\@biblabel{\@arabic\c@enumiv}}%
+	{\settowidth\labelwidth{\@biblabel{#1}}%
+		\leftmargin\labelwidth
+		\advance\leftmargin\labelsep
+		\@openbib@code
+		\usecounter{enumiv}%
+		\let\p@enumiv\@empty
+		\renewcommand\theenumiv{\@arabic\c@enumiv}}%
+	\sloppy
+	\clubpenalty4000
+	\@clubpenalty\clubpenalty
+	\widowpenalty4000%
+	\sfcode`\.\@m}
+{\def\@noitemerr
+	{\@latex@warning{Empty `thebibliography' environment}}%
+	\endlist}
+
+\makeatother%% プリアンブルで定義する場合は必須
+
 
 \begin{document}
 \maketitle
@@ -113,7 +139,6 @@
 本章ではこの2種類のメソッド定義の方式をモデル化する．
 
 \section{クラスにメソッドを定義するモデル}
-\label{section:class-model}
 
 Smalltalk，C++，Java，Rubyなどの言語に組み込まれているオブジェクトシステムでは，\textbf{クラス}に
 所属する形でメソッドを定義する．
@@ -184,10 +209,13 @@ Common Lispは複数の引数のクラスに応じてメソッドを選択する
 第\ref{chapter:conventional}章でモデル化した2種類のオブジェクトシステムは，
 メソッドを格納するコンテナとしてのクラスまたは総称関数の存在を仮定し，メソッドをクラス名とメソッド名によって
 2段階に分けて分類していた．
-本章ではこのようなコンテナの存在を仮定しないメソッド定義モデル，およびそれに基づく新しいオブジェクトシステムを
-提案する．
+本章ではこの代替となりうるメソッド定義モデル，およびそれに基づく新しいオブジェクトシステムを提案する．
 
 \section{環境にメソッドを直接定義するモデル}
+
+図\ref{figure:class-model}および図\ref{figure:gf-model}の代替となりうるメソッドの分類方法として，
+図\ref{figure:containerlsss-model}のような木構造が考えられる．
+これをメソッド定義モデルとしてとらえると，\textbf{環境にメソッドを直接定義するモデル}であるといえる．
 
 \begin{figure}[htbp]
 	\centering
@@ -196,19 +224,30 @@ Common Lispは複数の引数のクラスに応じてメソッドを選択する
 	\label{figure:containerlsss-model}
 \end{figure}
 
-メソッドはコンテナを介さず，環境に対して直接定義されま
-す．図で表すと，環境にクラス名とメソッド名の
-組によってラベル付けされたメソッドが直接ぶら
-下がるイメージです．従来のメソッドがクラス名
-とメソッド名の2つによって2段階に分けて分類さ
-れていたのに対し，提案するモデルではクラス名
-とメソッド名の組による1段階のみの分類となりま
-す．
+環境からメソッドへと伸びる枝は\textbf{クラス名とメソッド名の組}によってラベル付けされる．
+第\ref{chapter:conventional}章で述べた2つのモデルがメソッドをクラス名とメソッド名によって
+2段階に分けて分類していたのに対し，このモデルではクラス名とメソッド名の組による1段階のみの分類を行う．
+このためメソッドのコンテナとしてのクラスや総称関数の存在を仮定する必要はない．
+本稿ではこの特徴にちなんで，このモデルに基づくオブジェクトシステムを
+\textbf{Containerlsssなオブジェクトシステム}と呼ぶ．
+
+\section{Containerlessなオブジェクトシステム}
+
+Containerlessなオブジェクトシステムとはコンテナとしてのクラスや総称関数を用いず
+環境にメソッドを直接定義するオブジェクトシステムの総称である．
+ここでいう環境とは，クラス名とメソッド名の組をメソッドに対応付けるものである．
+
+Containerlessなオブジェクトシステムという単語が規定するのはこのメソッド定義モデルのみであり，
+その他の要素によって様々なバリエーションが考えられる．
+第\ref{chapter:suzu}章ではContainerlessなオブジェクトシステムの実装例として
+独自言語Suzuを紹介し，第\ref{chapter:discussion}章で
 
 
 \chapter{実装：プログラミング言語Suzu}
+\label{chapter:suzu}
 
 \chapter{考察}
+\label{chapter:discussion}
 
 \begin{enumerate}
 \item プロトタイプベースの方が動的
@@ -225,7 +264,7 @@ Common Lispは複数の引数のクラスに応じてメソッドを選択する
 
 \newpage
 
-\addcontentsline{toc}{chapter}{\numberline{}参考文献}
+%\addcontentsline{toc}{chapter}{\numberline{}参考文献}
 \renewcommand{\bibname}{参考文献}
 
 %% 参考文献に jbibtex を使う場合
