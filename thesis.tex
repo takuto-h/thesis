@@ -167,7 +167,63 @@ C#m = ...
 \chapter{プログラミング言語Suzu}
 \label{chapter:implementation}
 
+任意の式を記述できる箇所は\verb|...|を用いて省略する．
+
 \section{基本的な要素}
+
+変数は\verb|let|を用いて定義する．例えば変数\verb|x|を\verb|...|の値で初期化して定義するには
+以下のようにする．
+\begin{quote}
+\begin{verbatim}
+let x = ...
+\end{verbatim}
+\end{quote}
+
+Suzuでは関数リテラルを記述できる．引数\verb|param1|，\verb|param2|を受け取って\verb|...|を
+実行する関数は以下のように書ける．
+\begin{quote}
+\begin{verbatim}
+^(param1, param2){ ... }
+\end{verbatim}
+\end{quote}
+
+関数は\verb|def|を用いて定義できる．
+\begin{quote}
+\begin{verbatim}
+def func(param1, param2):
+  ...
+end
+\end{verbatim}
+\end{quote}
+これは以下のコードと等価である．
+\begin{quote}
+\begin{verbatim}
+let func = ^(param1, param2){ ... }
+\end{verbatim}
+\end{quote}
+
+関数\verb|func|を引数\verb|arg1|，\verb|arg2|で呼び出すには以下のようにする．
+\begin{quote}
+\begin{verbatim}
+func(arg1, arg2)
+\end{verbatim}
+\end{quote}
+
+関数リテラルを高階関数の最後の引数として渡す際は専用の構文が使える．例えば
+\begin{quote}
+\begin{verbatim}
+func(arg1, arg2, ^(param1, param2){ ... })
+\end{verbatim}
+\end{quote}
+という関数呼び出しは
+\begin{quote}
+\begin{verbatim}
+func(arg1, arg2)^(param1, param2):
+  ...
+end
+\end{verbatim}
+\end{quote}
+と書ける．
 
 \section{オブジェクトシステム}
 
