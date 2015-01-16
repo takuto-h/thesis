@@ -278,7 +278,7 @@ func(arg1, arg2)
 \end{verbatim}
 \end{quote}
 
-関数リテラルを最後の引数として渡す際は専用の構文が使える．例えば
+最後の引数として関数リテラルを渡す際は専用の構文が使える．例えば
 \begin{quote}
 \begin{verbatim}
 func(arg1, arg2, ^(param1, param2){ ... })
@@ -292,15 +292,50 @@ func(arg1, arg2)^(param1, param2):
 end
 \end{verbatim}
 \end{quote}
-と書ける．
+と書ける．他の実引数や関数リテラルの仮引数，またはその両方がない場合，
+\begin{quote}
+\begin{verbatim}
+func^(param1, param2):
+  ...
+end
+
+func(arg1, arg2):
+  ...
+end
+
+func:
+  ...
+end
+\end{verbatim}
+\end{quote}
+のように省略して書ける．
 
 Suzuでは\verb|:|からインデントの終わりまで（または\verb|{|から\verb|}|まで）をブロックと呼ぶ．
 ブロック内のコードを実行する際は新たなレキシカル環境が生成され有効になり，実行が終わると破棄される．
 変数は有効なレキシカル環境に定義される．よってブロック内で定義された変数はブロック内でのみ参照可能な
-ローカル変数となる．
-
+ローカル変数となる．例えば
+\begin{quote}
+\begin{verbatim}
+def begin(thunk):
+  thunk()
+end
+\end{verbatim}
+\end{quote}
+のような関数\verb|begin|を用いて
+\begin{quote}
+\begin{verbatim}
+begin:
+  let v = ...
+  ...
+end
+\end{verbatim}
+\end{quote}
+と書いた場合，変数\verb|v|は\verb|begin|から\verb|end|内のみで有効なローカル変数である．
 
 \section{オブジェクトシステム}
+
+
+
 
 \section{モジュールシステム}
 
