@@ -418,6 +418,105 @@ p.(y=)(4)
 
 \section{モジュールシステム}
 
+Suzuはメソッドを変数と同様レキシカル環境に定義する．そのため可視性の制御も変数と同様
+モジュールによって行う．
+
+モジュールを定義するには以下のようにする．
+\begin{quote}
+\begin{verbatim}
+module M:
+  let f = ...
+  let C#m = ...
+  ...
+  export f, C#m
+end
+\end{verbatim}
+\end{quote}
+これにより，変数\verb|f|とメソッド\verb|C#m|をエクスポートするモジュール\verb|M|が定義される．
+\verb|let|（または\verb|def|）を用いて変数やメソッドを定義した後，\verb|export|の後に
+エクスポートしたい変数の変数名や，メソッドを表すクラス名とメソッド名の組を並べて指定する．
+エクスポートされている変数やメソッドは\verb|::|を用いて，\verb|M::f|，\verb|M::(C#m)|のように
+参照できる．
+モジュール内で定義した変数やメソッドをエクスポートしなかった場合，それらはモジュール内でのみ有効な
+モジュールローカルな変数，またはメソッドとなる．
+
+モジュールは任意のスコープで\verb|open|できる．例えば
+\begin{quote}
+\begin{verbatim}
+begin:
+  open M
+  ...
+end
+\end{verbatim}
+\end{quote}
+とすると，\verb|begin|から\verb|end|までのブロックで\verb|M|からエクスポートされている変数やメソッドを
+修飾子なしで参照できるようになる．
+\verb|M|を先ほど定義したものとすると，\verb|f|，\verb|C#m|のように変数やメソッドを参照可能となる．
+
+既存のモジュールを活用して新しいモジュールを定義する際は\verb|include|が便利である．
+\begin{quote}
+\begin{verbatim}
+module B:
+  include A
+  ...
+end
+\end{verbatim}
+\end{quote}
+この例ではモジュール\verb|B|内でモジュール\verb|A|を\verb|include|している．
+\verb|include A|とするとまず\verb|open A|が行われ，次に\verb|A|からエクスポートされている
+変数やメソッドをすべて\verb|B|からもエクスポートする．
+これによりモジュール\verb|A|を拡張した新たなモジュール\verb|B|を容易に定義できる．
+
+\verb|open|や\verb|include|によって新しく参照可能になる変数やメソッドが衝突する場合，
+そのコードはエラーとなる．
+例えば以下のコードは\verb|open Y|で\verb|C#q|が衝突するためエラーとなる．
+\begin{quote}
+\begin{verbatim}
+module X:
+  ... 
+  export C#p, C#q
+end
+module Y:
+  ...
+  export C#q, C#r
+end
+begin:
+  open X
+  open Y
+  ...
+end
+\end{verbatim}
+\end{quote}
+これを回避するには\verb|except|を用いる．
+\begin{quote}
+\begin{verbatim}
+begin:
+  open X except C#q
+  open Y
+  ...
+end
+\end{verbatim}
+\end{quote}
+この例では\verb|X|を\verb|open|する際\verb|C#q|を\verb|except|している．
+これによりこの時点で\verb|C#q|はインポートされない．
+よって\verb|open Y|としてもエラーは起きない．
+
+Suzuにはパラメータ化されたモジュールとしてのトレイトという機構がある．
+トレイトは値を受け取ってモジュールを返す関数である．
+\begin{quote}
+\begin{verbatim}
+trait T(param1, param2):
+  let f = ...
+  let C#m = ...
+  ...
+  export f, C#m
+end
+\end{verbatim}
+\end{quote}
+この例では\verb|param1|と\verb|param2|を受け取って，\verb|f|と\verb|C#m|を
+エクスポートするモジュールを返すトレイト\verb|T|を定義している．
+トレイトの活用法については第\ref{chapter:discussion}章で述べる．
+
 
 \chapter{プログラム例と考察}
 \label{chapter:discussion}
