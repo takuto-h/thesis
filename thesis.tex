@@ -334,8 +334,87 @@ end
 
 \section{オブジェクトシステム}
 
+Suzuでは変数名の代わりにクラス名とメソッド名の組を指定し，メソッドを変数と同様レキシカル環境に定義する．
+つまりメソッドを定義するには，
+\begin{quote}
+\begin{verbatim}
+def C#m(self, param1, param2):
+  ...
+end
+\end{verbatim}
+\end{quote}
+または
+\begin{quote}
+\begin{verbatim}
+let C#m = ^(self, param1, param2){ ... }
+\end{verbatim}
+\end{quote}
+のようにする．\verb|C|はクラス名，\verb|m|はメソッド名，\verb|C#m|はクラス名とメソッド名の組である．
 
+定義したメソッドは\verb|C#m|と書くことで変数のように参照できる他，
+\verb|inst|をクラス\verb|C|のインスタンスとすると以下のようにして呼び出せる．
+\begin{quote}
+\begin{verbatim}
+inst.m(arg1, arg2)
+\end{verbatim}
+\end{quote}
+このとき\verb|self|には\verb|inst|，\verb|param1|には\verb|arg1|，
+\verb|param2|には\verb|arg2|の内容がそれぞれ代入される．
+つまりメソッドの第1引数にはメソッド呼び出しの対象となったオブジェクト自身が，第2引数以降には実引数が渡される．
 
+クラスは以下のようにして定義する．
+\begin{quote}
+\begin{verbatim}
+class Point = make_point:
+  x
+  y
+end
+\end{verbatim}
+\end{quote}
+これにより，クラス\verb|Point|，コンストラクタ関数\verb|make_point|，
+ゲッターメソッド\verb|Point#x|，\verb|Point#y|が定義される．
+\verb|make_point|は\verb|x|と\verb|y|というフィールドを持った\verb|Point|のインスタンスを生成する
+関数である．
+フィールドへのアクセスは\verb|Point#x|，\verb|Point#y|を介してのみ行える．
+例えば
+\begin{quote}
+\begin{verbatim}
+let p = make_point(1, 2)
+\end{verbatim}
+\end{quote}
+とすると，\verb|p.x|は\verb|1|，\verb|p.y|は\verb|2|となる．
+
+クラス定義の際，
+\begin{quote}
+\begin{verbatim}
+class Point = make_point:
+  mutable x
+  mutable y
+end
+\end{verbatim}
+\end{quote}
+のようにフィールド名の前に\verb|mutable|と書いた場合，上記に加えてセッターメソッド\verb|Point#(x=)|，
+\verb|Point#(y=)|が定義される．
+\begin{quote}
+\begin{verbatim}
+p.x = 3
+p.y = 4
+\end{verbatim}
+\end{quote}
+のような式は
+\begin{quote}
+\begin{verbatim}
+p.(x=)(3)
+p.(y=)(4)
+\end{verbatim}
+\end{quote}
+と解釈されるため，これを用いて\verb|Point#(x=)|や\verb|Point#(y=)|を呼び出すことで
+\verb|p|のフィールド\verb|x|，\verb|y|を書き換えられる．
+
+ここまで述べてきたことから分かるように，Suzuではクラス定義とメソッド定義を分けて記述する．
+つまりはクラスを定義した後に，そのクラスのインスタンスを操作するメソッドを自由に追加できる．
+また，メソッドは変数と同様レキシカル環境に定義されるため，特定のブロック内でのみ有効な
+ローカルメソッドを定義できる．
 
 \section{モジュールシステム}
 
