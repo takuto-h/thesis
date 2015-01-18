@@ -608,16 +608,136 @@ Suzuのメソッド定義はクラス定義とは独立しており，モジュ�
 定義することができる．
 そのため対象のクラスによらず関連性の高いメソッドを集めて柔軟にグループ化できる．
 
+以下の例ではいくつかの組み込みオブジェクトに対しJSON化メソッド
+\verb|to_json|を提供するモジュール\verb|ToJSON|を定義している.
+\begin{quote}
+\begin{verbatim}
+module ToJSON:
+  let Int::C#to_json = ...
+  let String::C#to_json = ...
+  let List::C#to_json = ...
+  ...
+end
+
+begin:
+  open ToJSON:
+  p([1,2,3].to_json) //=> "[1,2,3]"
+end
+\end{verbatim}
+\end{quote}
+このような変換処理を行うにはクラスごとに同名のメソッドを定義する必要があり，
+クラスにメソッドを定義する言語では定義が各クラスに分散してしまう．
+Suzuはレキシカル環境にメソッドを定義するためメソッド群をモジュールとして提供でき，
+関連するメソッドを1箇所にまとめて定義することができる．
 
 
-\section{多重継承}
-superとか
+\section{演算子の局所的な再定義}
 
-\section{アクセス制限}
-protectedはない
+Suzuでは演算子の適用がメソッド呼び出しとして扱われる．そのため演算子に対応する
+メソッドを局所的に再定義することで，その振る舞いを変えることができる．
 
-\section{ローカルメソッド}
-Refinements
+例えば整数同士の割り算を行うメソッド\verb|Int::C#(/)|は，組み込みのものは
+整数を返す．しかしながら以下のように修正版のメソッドを提供するモジュールを
+定義して\verb|open|することで，これを特定のブロックでのみ浮動小数点数を
+返すように変えることができる.
+\begin{quote}
+\begin{verbatim}
+module Quotient:
+  let Int::C#(/) = ...
+  ...
+end
+
+p(3 / 2) //=> 1
+begin:
+  open Quotient
+  p(3 / 2) //=> 1.5
+end
+p(3 / 2) //=> 1
+\end{verbatim}
+\end{quote}
+
+\section{内部DSL}
+
+Suzuは演算子をユーザー定義する際の自由度が高い．
+演算子をローカルメソッドとして定義すれば,グローバル環境を汚染せず可読性の高い
+言語内DSLを作成できる.
+以下の例では演算子式によって正規表現を構築できるDSLを提供するモジュール
+\verb|PrettyRegex|を定義している.
+\begin{quote}
+\begin{verbatim}
+module PrettyRegex:
+  let String::C#(|) = ...
+  let Char::C#(-) = ...
+  ...
+end
+
+let regex = begin:
+  open PrettyRegex
+  ("foo"|"bar")+('0'-'9').one_or_more
+end
+p(regex) //=> "(foo|bar)[0-9]+"
+\end{verbatim}
+\end{quote}
+縦棒やハイフンといった衝突の危険が高いと思われる短い演算子も，
+スコープを限定して定義することで安心して使用できる.
+
+\section{パラメータ化されたモジュール}
+
+Suzuにはパラメータ化されたモジュールとしてのトレイトという機能がある．
+トレイトを使うと，対象のクラスと必要なメソッドを与えることで
+複数のメソッドを提供するモジュールを返す関数を書くことができる．
+
+例えば以下の例では\verb|BankAccount|と\verb|StockAccount|に
+共通するメソッドをトレイト\verb|Account|によって提供している．
+\begin{quote}
+\begin{verbatim}
+trait Account(C, C#balance, ...):
+  ...
+  export C#deposit!, C#withdraw!
+end
+
+open Account(BankAccount, BankAccount#balance, ...)
+open Account(StockAccount, StockAccount#balance, ...)
+\end{verbatim}
+\end{quote}
+トレイト\verb|Account|はクラス\verb|C|とメソッド\verb|C#balance|を
+受け取って，メソッド\verb|C#deposit!|，\verb|C#withdraw!|を提供する
+モジュールを返す関数である．
+戻り値のモジュールを\verb|open|することでそのスコープでメソッドが有効になる．
+これは，\verb|C#balance|が定義されている任意のクラス\verb|C|に
+\verb|C#deposit!|および\verb|C#withdraw!|を提供する関数であると言える．
+
+
+\section{多重継承の代替}
+
+トレイトは多重継承の代替機構としても利用できる.
+以下の例ではメソッド\verb|read|を定義するトレイト\verb|Readable|と
+\verb|write|を定義する\verb|Writable|をクラス\verb|ReadWriteStream|
+に対して呼び出し\verb|open|することで，\verb|read|と\verb|write|の
+両方のメソッドを提供している．
+\begin{quote}
+\begin{verbatim}
+trait Readable(C, ...):
+  let C#read = ...
+  ...
+end
+
+trait Writable(C, ...):
+  let C#write = ...
+  ...
+end
+
+open Readable(ReadWriteStream, ...)
+open Writable(ReadWriteStream, ...)
+\end{verbatim}
+\end{quote}
+もしメソッドの衝突が起きるようならばエラーが起きるため，
+\verb|except|を使って適切に回避する必要がある．
+
+このように，Suzuはメソッドをクラスではなくレキシカル環境に定義するため，
+モジュールシステムによってメソッドを整理・再利用・局所的に有効化することが
+できる．
+
 
 \chapter{関連研究}
 \label{chapter:related-work}
