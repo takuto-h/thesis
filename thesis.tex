@@ -785,27 +785,38 @@ Suzuのメソッド定義はクラス定義とは独立しており，モジュ�
 定義することができる．
 そのため対象のクラスによらず関連性の高いメソッドを集めて柔軟にグループ化できる．
 
-以下の例ではいくつかの組み込みオブジェクトに対しJSON化メソッド
-\verb|to_json|を提供するモジュール\verb|ToJSON|を定義している.
+例えばオブジェクトをJSON形式でシリアライズするメソッド\verb|to_json|を
+定義したい場合，クラスにメソッドを定義する言語では定義が各クラスに分散して
+しまう．
+
+Suzuでは以下のように複数のクラスのインスタンスに対するメソッドを提供する
+モジュールを定義することで，関連するメソッドを1箇所にまとめて定義できる．
 \begin{quote}
 \begin{verbatim}
 module ToJSON:
-  let Int::C#to_json = ...
+  let    Int::C#to_json = ...
   let String::C#to_json = ...
-  let List::C#to_json = ...
+  let   List::C#to_json = ...
   ...
-end
-
-begin:
-  open ToJSON:
-  p([1,2,3].to_json) //=> "[1,2,3]"
 end
 \end{verbatim}
 \end{quote}
-このような変換処理を行うにはクラスごとに同名のメソッドを定義する必要があり，
-クラスにメソッドを定義する言語では定義が各クラスに分散してしまう．
-Suzuはレキシカル環境にメソッドを定義するためメソッド群をモジュールとして提供でき，
-関連するメソッドを1箇所にまとめて定義することができる．
+利用する側は有効にしたいスコープで\verb|open ToJSON|とすればよい．
+
+また，ユーザーが新たに定義したデータ型などさらに多くのオブジェクトにメソッドを
+提供したい場合，
+\begin{quote}
+\begin{verbatim}
+module ToJSONExt:
+  include ToJSON
+  let UserDefinedData1#to_json = ...
+  let UserDefinedData2#to_json = ..
+  ...
+end
+\end{verbatim}
+\end{quote}
+のように\verb|include|を用いて，既存のモジュールを拡張した
+新たなモジュールを定義できる．
 
 
 \section{演算子の局所的な再定義}
@@ -814,14 +825,28 @@ Suzuでは演算子の適用がメソッド呼び出しとして扱われる．�
 メソッドを局所的に再定義することで，その振る舞いを変えることができる．
 
 例えば整数同士の割り算を行うメソッド\verb|Int::C#(/)|は，組み込みのものは
-整数を返す．しかしながら以下のように修正版のメソッドを提供するモジュールを
-定義して\verb|open|することで，これを特定のブロックでのみ浮動小数点数を
-返すように変えることができる.
+整数を返す．
+これを浮動小数点数を返す関数\verb|Int::quo|で置き換えたい場合，
+単に\verb|let|を用いればよい．
+\begin{quote}
+\begin{verbatim}
+p(3 / 2) //=> 1
+begin:
+  let Int::C#(/) = Int::quo
+  p(3 / 2) //=> 1.5
+end
+p(3 / 2) //=> 1
+\end{verbatim}
+\end{quote}
+
+また以下のようなモジュール\verb|Quotient|を定義しておけば，
+ブロック内で\verb|open|することでそのスコープでのみ浮動小数点数を
+返すよう変えることができる.
 \begin{quote}
 \begin{verbatim}
 module Quotient:
-  let Int::C#(/) = ...
-  ...
+  let Int::C#(/) = Int::quo
+  export Int::C#(/)
 end
 
 p(3 / 2) //=> 1
@@ -833,21 +858,47 @@ p(3 / 2) //=> 1
 \end{verbatim}
 \end{quote}
 
+Suzuのメソッドはレキシカルスコープなので，ブロック内から呼び出した先の関数に
+影響を与えることなく安全に演算子の再定義ができる．
+
+
 \section{内部DSL}
 
-Suzuは演算子をユーザー定義する際の自由度が高い．
-演算子をローカルメソッドとして定義すれば,グローバル環境を汚染せず可読性の高い
-内部DSLを作成できる.
-以下の例では演算子式によって正規表現を構築できるDSLを提供するモジュール
-\verb|PrettyRegex|を定義している.
+DSLとはDomain Specific Languageの略で，特定の問題を解決するのに特化した
+ミニ言語のことである．
+特に内部DSLとは，プログラム内に記述できる式として構築したDSLを指す．
+
+Suzuは演算子として使用できる文字列に自由度があるため，
+演算子をローカルメソッドとして定義すれば，グローバル環境を汚染せず可読性の高い
+内部DSLを作成できる．
+以下の例は演算子式によって正規表現を構築できるDSLを提供するモジュール
+\verb|PrettyRegex|を定義している．\verb|String::format|は
+文字列整形関数である．
 \begin{quote}
 \begin{verbatim}
 module PrettyRegex:
-  let String::C#(|) = ...
-  let Char::C#(-) = ...
-  ...
+  def String::C#(|)(lhs, rhs):
+    String::format("({0}|{1})", lhs, rhs)
+  end
+  def String::C#(+)(lhs, rhs):
+    String::format("{0}{1}", lhs, rhs)
+  end
+  def Char::C#(-)(lhs, rhs):
+    String::format("[{0}-{1}]", lhs, rhs)
+  end
+  def String::C#one_or_more(exp):
+    String::format("{0}+", exp)
+  end
+  export String::C#(|)
+  export String::C#(+)
+  export String::C#one_or_more
+  export Char::C#(-)
 end
-
+\end{verbatim}
+\end{quote}
+これは以下のように使用できる．
+\begin{quote}
+\begin{verbatim}
 let regex = begin:
   open PrettyRegex
   ("foo"|"bar")+('0'-'9').one_or_more
@@ -855,8 +906,9 @@ end
 p(regex) //=> "(foo|bar)[0-9]+"
 \end{verbatim}
 \end{quote}
-縦棒やハイフンといった衝突の危険が高いと思われる短い演算子も，
-スコープを限定して定義することで安心して使用できる.
+縦棒やプラス，ハイフンといった衝突の危険が高いと思われる短い演算子も，
+スコープを限定して定義することで安心して使用できる．
+
 
 \section{パラメータ化されたモジュール}
 
@@ -864,23 +916,19 @@ Suzuにはパラメータ化されたモジュールとしてのトレイトと�
 トレイトを使うと，対象のクラスと必要なメソッドを与えることで
 複数のメソッドを提供するモジュールを返す関数を書くことができる．
 
-例えば以下の例では\verb|BankAccount|と\verb|StockAccount|に
-共通するメソッドをトレイト\verb|Account|によって提供している．
+例えばトレイト\verb|Enumerable|はクラス\verb|C|とメソッド
+\verb|C#each|を与えて戻り値を\verb|open|することで，
 \begin{quote}
 \begin{verbatim}
-trait Account(C, C#balance, ...):
+trait Enumerable(C, C#each):
+  let C#map = ...
+  let C#count = ...
+  let C#find = ...
+  let C#reduce = ...
   ...
-  export C#deposit!, C#withdraw!
 end
-
-open Account(BankAccount, BankAccount#balance, ...)
-open Account(StockAccount, StockAccount#balance, ...)
 \end{verbatim}
 \end{quote}
-トレイト\verb|Account|はクラス\verb|C|とメソッド\verb|C#balance|を
-受け取って，メソッド\verb|C#deposit!|，\verb|C#withdraw!|を提供する
-モジュールを返す関数である．
-戻り値のモジュールを\verb|open|することでそのスコープでメソッドが有効になる．
 これは，\verb|C#balance|が定義されている任意のクラス\verb|C|に
 \verb|C#deposit!|および\verb|C#withdraw!|を提供する関数であると言える．
 
@@ -919,19 +967,21 @@ open Writable(ReadWriteStream, ...)
 \chapter{関連研究}
 \label{chapter:related-work}
 
-Suzuのメソッド定義方式がもたらすのと類似した柔軟性を持つ既存の概念について
+Suzuのメソッド定義方式がもたらす柔軟性に類似した性質を持つ既存の概念について
 述べる．
 
 GluonJ\cite{GluonJ}はアスペクト指向プログラミングを支援するJavaの拡張である．
-Glueと呼ばれるクラスを定義することで既存のクラスの外部でメソッドを
-定義できるが，再定義の影響範囲を限定することができない．
+Glueと呼ばれるクラスを定義することで，既存のクラスに対しメソッドを追加・再定義する
+などの拡張が可能である．
+しかし拡張の影響はグローバルで範囲を限定することはできない．
 
 C\#の拡張メソッド\cite{ExtentionMethods}は既存のクラスにメソッドを
 追加したように見せることができる．
 実際に呼ばれるのは第1引数に\verb|this|と指定した静的メソッドである．
 拡張メソッドは\verb|using|ディレクティブによって有効無効を制御できるが，
 同じシグネチャを持つ拡張メソッドが複数存在する場合エラーが起き，
-またこれを回避する仕組みを持たない．
+これを回避する仕組みを持たない．
+また既に通常の方法で定義されているメソッドを再定義することもできない．
 
 Scala\cite{Scala}のimplicit conversionも既存のクラスに対しメソッドを
 追加したように見せる機能である．
@@ -939,6 +989,8 @@ Scala\cite{Scala}のimplicit conversionも既存のクラスに対しメソッ�
 呼び出している．
 スコープはブロック単位で制御できるが，同じシグネチャのメソッドを提供する
 型への変換が複数存在する場合エラーが起き，これを回避する仕組みを持たない．
+またこれも拡張メソッドと同様，既に通常の方法で定義されているメソッドを
+再定義することはできない．
 
 Haskellの型クラス\cite{TypeClasses}はオブジェクト指向プログラミングのための
 機構ではないが，
@@ -988,8 +1040,8 @@ SuzuのモジュールシステムはRefinementsに近い．ただしSuzuは
 MixJuice\cite{MixJuice}はクラス定義を複数のモジュールに分割して
 書くことができる言語である．
 MixJuiceによるモジュール分割はSuzuが行えるそれと非常に類似している．
-MixJuiceにはパラメータ化されたモジュールがなく，
-Suzuには静的な型検査がないという違いがある．
+MixJuiceにはパラメータ化されたモジュールがないがSuzuにはある，
+Suzuには静的な型検査がないがMixJuiceにはあるという違いがある．
 
 
 \chapter{今後の課題}
