@@ -370,7 +370,7 @@ Pythonでは
 \chapter{プログラミング言語Suzu}
 \label{chapter:implementation}
 
-変数とメソッドを共にレキシカル環境に定義するプログラミング言語Suzuの言語仕様を
+レキシカル環境にメソッドを定義するプログラミング言語Suzuの言語仕様を
 コード例を交えて解説する．
 コード例において式を省略する際は\verb|...|を用いる．
 
@@ -459,7 +459,8 @@ def begin(thunk):
 end
 \end{verbatim}
 \end{quote}
-のような関数\verb|begin|を用いて
+のような無引数の関数\verb|thunk|を受け取って呼び出す高階関数
+\verb|begin|に
 \begin{quote}
 \begin{verbatim}
 begin:
@@ -468,8 +469,8 @@ begin:
 end
 \end{verbatim}
 \end{quote}
-と書いた場合，変数\verb|v|は\verb|begin|から\verb|end|内のみで有効な
-ローカル変数である．
+のように無引数の関数リテラルを渡して呼び出させた場合，変数\verb|v|は
+\verb|begin|から\verb|end|の間のみで有効なローカル変数となる．
 
 \section{オブジェクトシステム}
 
@@ -499,10 +500,16 @@ let C#m = ^(self, param1, param2){ ... }
 inst.m(arg1, arg2)
 \end{verbatim}
 \end{quote}
-このとき\verb|self|には\verb|inst|，\verb|param1|には\verb|arg1|，
-\verb|param2|には\verb|arg2|の内容がそれぞれ代入される．
-つまりメソッドの第1引数にはメソッド呼び出しの対象となったオブジェクト自身が，
+これは以下の呼び出しと同じ結果となる．
+\begin{quote}
+\begin{verbatim}
+C#m(inst, arg1, arg2)
+\end{verbatim}
+\end{quote}
+このように，メソッドの第1引数にはメソッド呼び出しの対象となったオブジェクト自身が，
 第2引数以降には実引数が渡される．
+つまり\verb|self|には\verb|inst|，\verb|param1|には\verb|arg1|，
+\verb|param2|には\verb|arg2|の内容がそれぞれ代入される．
 
 クラスは以下のようにして定義する．
 \begin{quote}
@@ -535,7 +542,7 @@ class Point = make_point:
 end
 \end{verbatim}
 \end{quote}
-のようにフィールド名の前に\verb|mutable|と書いた場合，上記に加えて
+のようにフィールド名の前に\verb|mutable|と書くと，上記に加えて
 セッターメソッド\verb|Point#(x=)|，\verb|Point#(y=)|が定義される．
 \begin{quote}
 \begin{verbatim}
@@ -582,7 +589,9 @@ x.(<-)(y)
 
 \section{モジュールシステム}
 
-Suzuはメソッドを変数と同様レキシカル環境に定義する．そのため可視性の制御も変数と同様
+モジュールシステムとは，変数やメソッドのエクスポート・インポートを制御し，抽象化や
+再利用を促進する機構である．
+Suzuはメソッドを変数と同様レキシカル環境に定義するため，可視性の制御も変数と同様
 モジュールによって行う．
 
 モジュールを定義するには以下のようにする．
@@ -668,7 +677,7 @@ end
 \end{quote}
 この例では\verb|X|を\verb|open|する際\verb|C#q|を\verb|except|している．
 これによりこの時点で\verb|C#q|はインポートされない．
-よって\verb|open Y|としてもエラーは起きない．
+よって\verb|open Y|としても衝突は起こらずエラーは回避される．
 
 Suzuにはパラメータ化されたモジュールとしてのトレイトという機構がある．
 トレイトは値を受け取ってモジュールを返す関数である．
