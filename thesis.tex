@@ -699,8 +699,7 @@ end
 \chapter{考察}
 \label{chapter:discussion}
 
-Suzuのローカルメソッドやユーザー定義演算子，モジュールシステムを生かした
-プログラム例によって，
+Suzuのローカルメソッドやモジュールシステムを生かしたプログラム例によって，
 レキシカル環境にメソッドを定義することの有用性について検証する．
 なお，\verb|p|は引数として受け取った値を出力する関数，
 \verb|//|から行末まではコメントである．
@@ -708,32 +707,76 @@ Suzuのローカルメソッドやユーザー定義演算子，モジュール�
 
 \section{組み込みオブジェクトに対するメソッドの追加}
 
-まず整数値に対するメソッドを複数提供する\verb|Seconds|というモジュールを
-例に挙げる．
+Suzuではメソッド定義がクラス定義から独立しているため，組み込みオブジェクトに
+対するメソッドもユーザーが自由に追加できる．例えば，
 \begin{quote}
 \begin{verbatim}
-module Seconds:
-  let Int::C#minutes = ...
-  let Int::C#hours = ...
+p("program".pluralize)    //=> "programs"
+p("programs".singularize) //=> "program"
+p("person".pluralize)     //=> "people"
+p("people".singularize)   //=> "person"
+\end{verbatim}
+\end{quote}
+のように，文字列を複数形および単数形に変換するメソッド
+\verb|pluralize|，\verb|singularize|が欲しいと思えば，
+\begin{quote}
+\begin{verbatim}
+def String::C#pluralize(self):
   ...
 end
-
-begin:
-  open Seconds
-  p(3.minutes) //=> 180
-  p(2.hours)   //=> 7200
+def String::C#singularize(self):
+  ...
 end
 \end{verbatim}
 \end{quote}
-\verb|Seconds|をローカル環境でオープンすると，定義されているメソッドが
-そのスコープでのみ有効になる．
-\verb|Seconds|は分や時間を秒に変換する自然言語に近い読み方のできるメソッドを
-提供しており，例えば\verb|3.minutes|が\verb|180|，\verb|2.hours|が
-\verb|7200|となる．
-\verb|Int::C|というのはモジュール\verb|Int|内の変数\verb|C|で，
-整数値のクラス名を指している．
-整数値のような組み込みオブジェクトに対するメソッドを衝突のリスクを気にする
-ことなく追加できるのは利点である.
+のようにして定義できる．
+\verb|String::C|というのはモジュール\verb|String|の変数\verb|C|で，
+組み込みオブジェクトである文字列のクラス名を指している．
+
+定義をブロック内で行えばこれらはローカルメソッドとなるため，メソッドの衝突を
+未然に防ぐことができる．
+\begin{quote}
+\begin{verbatim}
+begin:
+  def String::C#pluralize(self):
+    ...
+  end
+  def String::C#singularize(self):
+    ...
+  end
+  ...
+end
+\end{verbatim}
+\end{quote}
+上の例では2つのメソッド定義は\verb|begin|から\verb|end|の間でのみ
+有効である．
+
+また，複数のメソッドをまとめてモジュールとして提供することもできる．
+\begin{quote}
+\begin{verbatim}
+module Noun:
+  def String::C#pluralize(self):
+    ...
+  end
+  def String::C#singularize(self):
+    ...
+  end
+  ...
+  export String::C#pluralize, String::C#singularize
+end
+\end{verbatim}
+\end{quote}
+これをブロック内で\verb|open|すれば直接定義したのと同じ効果が得られる．
+\begin{quote}
+\begin{verbatim}
+begin:
+  open Noun
+  ...
+end
+\end{verbatim}
+\end{quote}
+このように，利便性の高いメソッド群をユーザーがモジュールとして提供し，
+局所的に有効にすることでメソッド衝突の危険を避けながら利用できる．
 
 
 \section{メソッドの柔軟なグループ化}
