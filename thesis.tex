@@ -686,7 +686,7 @@ end
 \label{chapter:discussion}
 
 Suzuのローカルメソッドやモジュールシステムを生かしたプログラム例によって，
-レキシカル環境にメソッドを定義することの有用性について検証する．
+メソッドを変数と同じように定義することの有用性について検証する．
 なお，\verb|p|は引数として受け取った値を出力する関数，
 \verb|//|から行末まではコメントである．
 ここではコメントとして\verb|//=>|の後にプログラムの出力内容を記述する．
@@ -896,27 +896,137 @@ p(regex) //=> "(foo|bar)[0-9]+"
 スコープを限定して定義することで安心して使用できる．
 
 
-\section{パラメータ化されたモジュール}
+\section{トレイトによるメソッドの共通化}
 
-Suzuにはパラメータ化されたモジュールとしてのトレイトという機能がある．
-トレイトを使うと，対象のクラスと必要なメソッドを与えることで
-複数のメソッドを提供するモジュールを返す関数を書くことができる．
+複数のクラスに同じ内容のメソッドを定義したい場合，トレイトによってメソッドの定義を
+共通化できる．
 
-例えばトレイト\verb|Enumerable|はクラス\verb|C|とメソッド
-\verb|C#each|を与えて戻り値を\verb|open|することで，
+例えば銀行口座を表すクラス\verb|BankAccount|と株式口座を表すクラス
+\verb|StockAccount|にメソッドを定義することを考えてみる．
+\verb|BankAccount|は残高を表すフィールド\verb|balance|を持つ．
 \begin{quote}
-\begin{verbatim}
-trait Enumerable(C, C#each):
-  let C#map = ...
-  let C#count = ...
-  let C#find = ...
-  let C#reduce = ...
-  ...
-end
-\end{verbatim}
+	\begin{verbatim}
+	class BankAccount = make_bank_account:
+	  mutable balance
+	end
+	\end{verbatim}
 \end{quote}
-これは，\verb|C#balance|が定義されている任意のクラス\verb|C|に
-\verb|C#deposit!|および\verb|C#withdraw!|を提供する関数であると言える．
+預け入れを行うメソッド\verb|deposit!|と引き出しを行うメソッド
+\verb|withdraw!|は以下のように書ける．
+\begin{quote}
+	\begin{verbatim}
+	def BankAccount#deposit!(self, x):
+	  self.balance = self.balance + x
+	end
+	
+	def BankAccount#withdraw!(self, x):
+	  self.balance = self.balance - x
+	  if(self.balance < 0):
+	    self.balance = 0
+	  end
+	end
+	\end{verbatim}
+\end{quote}
+フィールドの参照およびフィールドへの代入には，クラス定義によって自動的に定義された
+ゲッターメソッド\verb|balance|とセッターメソッド\verb|balance=|を使用している．
+
+これに対し\verb|StockAccount|は株数を表すフィールド\verb|num_shares|と
+株単価を表すフィールド\verb|price_per_share|を持つ．
+\begin{quote}
+	\begin{verbatim}
+	class StockAccount = make_stock_account:
+	  mutable num_shares
+	  price_per_share
+	end
+	\end{verbatim}
+\end{quote}
+残高を取得するメソッド\verb|balance|と残高を変更するメソッド\verb|balance=|
+は以下のように定義できる．
+\begin{quote}
+	\begin{verbatim}
+	def StockAccount#balance(self):
+	  self.num_shares * self.price_per_share
+	end
+	
+	def StockAccount#(balance=)(self, x):
+	  self.num_shares = x / self.price_per_share
+	end
+	\end{verbatim}
+\end{quote}
+預け入れを行うメソッド\verb|deposit!|と引き出しを行うメソッド
+\verb|withdraw!|は以下のように書ける．
+\begin{quote}
+	\begin{verbatim}
+	def StockAccount#deposit!(self, x):
+	  self.balance = self.balance + x
+	end
+	
+	def StockAccount#withdraw!(self, x):
+	  self.balance = self.balance - x
+	  if(self.balance < 0):
+	    self.balance = 0
+	  end
+	end
+	\end{verbatim}
+\end{quote}
+
+ここで，メソッド\verb|deposit!|および\verb|withdraw!|の内容は，
+\verb|BankAccount|と\verb|StockAccount|とで同一であることが分かる．
+違いは定義対象のクラスと，使用している\verb|balance|および
+\verb|balance=|の定義である．
+
+Suzuではこのようなメソッドの定義をトレイトによって共通化できる．
+\begin{quote}
+	\begin{verbatim}
+	trait Account(C, C#balance, C#(balance=)):
+	  def C#deposit!(self, x):
+	    self.balance = self.balance + x
+	  end
+	
+	  def C#withdraw!(self, x):
+	    self.balance = self.balance - x
+	    if(self.balance < 0):
+	      self.balance = 0
+	    end
+	  end
+	
+	  export C#deposit!, C#withdraw!
+	end
+	\end{verbatim}
+\end{quote}
+トレイト\verb|Account|は，クラス\verb|C|，メソッド\verb|C#balance|，
+\verb|C#(balance=)|を引数として受け取り，
+メソッド\verb|C#deposit!|，\verb|C#withdraw!|が定義された
+モジュールを返す．
+\verb|Account|に\verb|BankAccount|と\verb|StockAccount|それぞれの
+クラスと\verb|balance|および\verb|balance=|を渡して呼び出し戻り値を
+\verb|open|すれば，それらを使用した\verb|deposit!|および
+\verb|withdraw!|が定義される．
+つまり，
+\begin{quote}
+	\begin{verbatim}
+	open Account(BankAccount,
+	             BankAccount#balance,
+	             BankAccount#(balance=))
+	\end{verbatim}
+\end{quote}
+とすれば\verb|BankAccount#deposit!|と\verb|BankAccount#withdraw!|が
+定義され，
+\begin{quote}
+	\begin{verbatim}
+	open Account(StockAccount,
+	             StockAccount#balance,
+	             StockAccount#(balance=))
+	\end{verbatim}
+\end{quote}
+とすれば\verb|StockAccount#deposit!|と\verb|StockAccount#withdraw!|が
+定義される
+
+このように，Suzuではクラスとメソッドによってパラメータ化したモジュールとしてトレイトを
+定義することでメソッドの定義を共通化することができ，その呼び出し結果を\verb|open|
+することで同じ内容のメソッドを繰り返し書く必要がなくなる．
+Suzuには継承機構が存在しないが，メソッドがモジュール等のレキシカル環境に所属するため
+実装の継承をモジュールシステムの機能によって代替できることを示している．
 
 
 \section{多重継承の代替}
@@ -1077,7 +1187,6 @@ Suzuではブロックという細かい単位でメソッドの再定義がで�
 現在Suzuの処理系はメソッド呼び出しに関して特に最適化を施しておらず，
 適切な最適化手法を考え実装することが課題である．
 
-\section{オブジェクトのmix}
 
 \chapter{結論}
 \label{chapter:conclusion}
