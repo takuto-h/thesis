@@ -694,6 +694,7 @@ Suzuのローカルメソッドやモジュールシステムを生かしたプ�
 ここではコメントとして\verb|//=>|の後にプログラムの出力内容を記述する．
 
 \section{組み込みオブジェクトに対するメソッドの追加}
+\label{section:builtin}
 
 Suzuではメソッド定義がクラス定義から独立しているため，組み込みオブジェクトに
 対するメソッドもユーザーが自由に追加できる．例えば，
@@ -767,47 +768,8 @@ end
 局所的に有効にすることでメソッド衝突の危険を避けながら利用できる．
 
 
-\section{メソッドの柔軟なグループ化}
-
-Suzuのメソッド定義はクラス定義とは独立しており，モジュールに所属する形で
-定義することができる．
-そのため対象のクラスによらず関連性の高いメソッドを集めて柔軟にグループ化できる．
-
-例えばオブジェクトをJSON形式でシリアライズするメソッド\verb|to_json|を
-定義したい場合，クラスにメソッドを定義する言語では定義が各クラスに分散して
-しまう．
-
-Suzuでは以下のように複数のクラスのインスタンスに対するメソッドを提供する
-モジュールを定義することで，関連するメソッドを1箇所にまとめて定義できる．
-\begin{quote}
-\begin{verbatim}
-module ToJSON:
-  let    Int::C#to_json = ...
-  let String::C#to_json = ...
-  let   List::C#to_json = ...
-  ...
-end
-\end{verbatim}
-\end{quote}
-利用する側は有効にしたいスコープで\verb|open ToJSON|とすればよい．
-
-また，ユーザーが新たに定義したデータ型などさらに多くのオブジェクトにメソッドを
-提供したい場合，
-\begin{quote}
-\begin{verbatim}
-module ToJSONExt:
-  include ToJSON
-  let UserDefinedData1#to_json = ...
-  let UserDefinedData2#to_json = ..
-  ...
-end
-\end{verbatim}
-\end{quote}
-のように\verb|include|を用いて，既存のモジュールを拡張した
-新たなモジュールを定義できる．
-
-
 \section{演算子の局所的な再定義}
+\label{section:operator}
 
 Suzuでは演算子の適用がメソッド呼び出しとして扱われる．そのため演算子に対応する
 メソッドを局所的に再定義することで，その振る舞いを変えることができる．
@@ -851,6 +813,7 @@ Suzuのメソッドはレキシカルスコープなので，ブロック内か�
 
 
 \section{内部DSL}
+\label{section:dsl}
 
 DSLとはDomain Specific Languageの略で，特定の問題を解決するのに特化した
 ミニ言語のことである．
@@ -898,7 +861,49 @@ p(regex) //=> "(foo|bar)[0-9]+"
 スコープを限定して定義することで安心して使用できる．
 
 
+\section{メソッドの柔軟なグループ化}
+\label{section:grouping}
+
+Suzuのメソッド定義はクラス定義とは独立しており，モジュールに所属する形で
+定義することができる．
+そのため対象のクラスによらず関連性の高いメソッドを集めて柔軟にグループ化できる．
+
+例えばオブジェクトをJSON形式でシリアライズするメソッド\verb|to_json|を
+定義したい場合，クラスにメソッドを定義する言語では定義が各クラスに分散して
+しまう．
+
+Suzuでは以下のように複数のクラスのインスタンスに対するメソッドを提供する
+モジュールを定義することで，関連するメソッドを1箇所にまとめて定義できる．
+\begin{quote}
+	\begin{verbatim}
+	module ToJSON:
+	let    Int::C#to_json = ...
+	let String::C#to_json = ...
+	let   List::C#to_json = ...
+	...
+	end
+	\end{verbatim}
+\end{quote}
+利用する側は有効にしたいスコープで\verb|open ToJSON|とすればよい．
+
+また，ユーザーが新たに定義したデータ型などさらに多くのオブジェクトにメソッドを
+提供したい場合，
+\begin{quote}
+	\begin{verbatim}
+	module ToJSONExt:
+	include ToJSON
+	let UserDefinedData1#to_json = ...
+	let UserDefinedData2#to_json = ..
+	...
+	end
+	\end{verbatim}
+\end{quote}
+のように\verb|include|を用いて，既存のモジュールを拡張した
+新たなモジュールを定義できる．
+
+
 \section{トレイトによるメソッドの共通化}
+\label{section:traits}
 
 複数のクラスに同じ内容のメソッドを定義したい場合，トレイトによってメソッドの定義を
 共通化できる．
@@ -1032,6 +1037,7 @@ Suzuには継承機構が存在しないが，メソッドがモジュール等�
 
 
 \section{多重継承の代替}
+\label{section:collision}
 
 トレイトは多重継承の代替機構としても利用できる.
 以下の例ではメソッド\verb|read|を定義するトレイト\verb|Readable|と
@@ -1057,9 +1063,24 @@ open Writable(ReadWriteStream, ...)
 もしメソッドの衝突が起きるようならばエラーが起きるため，
 \verb|except|を使って適切に回避する必要がある．
 
-このように，Suzuはメソッドをクラスではなくレキシカル環境に定義するため，
-モジュールシステムによってメソッドを整理・再利用・局所的に有効化することが
-できる．
+
+\section{本章のまとめ}
+
+Suzuではメソッド定義がクラス定義から独立しているので，組み込みクラスに対しメソッドを
+自由に追加・再定義できる．
+メソッドはレキシカル環境に定義されるので，追加や再定義の影響範囲はグローバルにも
+ローカルにもできる．
+ローカルな影響範囲はブロックという細かい単位で指定できる
+（\ref{section:builtin}節）．
+演算子の適用はメソッド呼び出しとして解釈されるので，演算子の追加や再定義も
+可能である（\ref{section:operator}節）．
+演算子にあたるメソッドをローカル定義することで，グローバル環境を汚染しない
+可読性の高い内部DSLを構築できる（\ref{section:dsl}節）．
+メソッド定義がクラス定義から独立していることは，対象のクラスに縛られないメソッドの
+グループ化も可能にしている（\ref{section:grouping}節）．
+またパラメータ化されたモジュールであるトレイトを使えば，メソッドを共通化し
+衝突を回避しながら再利用することができる（\ref{section:traits}節，
+\ref{section:collision}節）．
 
 
 \chapter{関連研究}
