@@ -1,0 +1,226 @@
+module PEG:
+  class PE:
+    def MkPE(proc)
+  end
+
+  class Result:
+    def Success(pos)
+    def Failure()
+  end
+
+  def parse(MkPE(proc), str):
+    proc(str, 0, Hash::create(16))
+  end
+
+  trait New():
+    let nonterms = Hash::create(16)
+    
+    def def_nonterm(name, MkPE(proc)):
+      nonterms[name] = proc
+    end
+    
+    def nonterm(name):
+      MkPE^(str, pos, caches):
+        match(Hash::get(caches, (name, pos))):
+        case(Some(result)):
+          result
+        case(None()):
+          let result = nonterms[name](str, pos, caches)
+          caches[(name, pos)] = result
+          result
+        end
+      end
+    end
+
+    def char(c):
+      MkPE^(str, pos, caches):
+        if(pos < String::length(str) && str[pos] == c):
+          Success(pos + 1)
+        else:
+          Failure()
+        end
+      end
+    end
+
+    def string(s):
+      let len = String::length(s)
+      MkPE^(str, pos, caches):
+        if(pos + len <= String::length(str) && String::sub(str, pos, len) == s):
+          Success(pos + len)
+        else:
+          Failure()
+        end
+      end
+    end
+
+    def char_of(cs):
+      MkPE^(str, pos, caches):
+        if(pos < String::length(str) && String::contain?(cs, str[pos])):
+          Success(pos + 1)
+        else:
+          Failure()
+        end
+      end
+    end
+    
+    let any_char = MkPE^(str, pos, caches):
+      if(pos < String::length(str)):
+        Success(pos + 1)
+      else:
+        Failure()
+      end
+    end
+
+    let empty = MkPE^(str, pos, caches):
+      Success(pos)
+    end
+
+    def seq(MkPE(proc1), MkPE(proc2)):
+      MkPE^(str, pos, caches):
+        match(proc1(str, pos, caches)):
+        case(Success(pos)):
+          proc2(str, pos, caches)
+        case(Failure()):
+          Failure()
+        end
+      end
+    end
+
+    def choice(MkPE(proc1), MkPE(proc2)):
+      MkPE^(str, pos, caches):
+        match(proc1(str, pos, caches)):
+        case(Success(pos)):
+          Success(pos)
+        case(Failure()):
+          proc2(str, pos, caches)
+        end
+      end
+    end
+
+    def zero_or_more(MkPE(proc)):
+      MkPE^(str, pos, caches):
+        def loop(pos):
+          match(proc(str, pos, caches)):
+          case(Success(pos)):
+            loop(pos)
+          case(Failure()):
+            Success(pos)
+          end
+        end
+        loop(pos)
+      end
+    end
+
+    def not(MkPE(proc)):
+      MkPE^(str, pos, caches):
+        match(proc(str, pos, caches)):
+        case(Success(pos)):
+          Failure()
+        case(Failure()):
+          Success(pos)
+        end
+      end
+    end
+    
+    def one_or_more(pe):
+      seq(pe, zero_or_more(pe))
+    end
+
+    def optional(pe):
+      choice(pe, empty)
+    end
+
+    def and(pe):
+      not(not(pe))
+    end
+
+    let String::C#(<-) = def_nonterm
+    let PE#(&) = seq
+    let PE#(|) = choice
+
+    export def_nonterm, nonterm, char, string, char_of, any_char, empty
+    export seq, choice, zero_or_more, not
+    export one_or_more, optional, and
+    export String::C#(<-), PE#(&), PE#(|)
+  end
+
+  export PE, Result, Success, Failure, parse, New
+end
+
+open DefaultEq(PEG::Result)
+
+def PEG::Result#failure?(self):
+  self == PEG::Failure()
+end
+
+def PEG::Result#success?(self):
+  !self.failure?
+end
+
+/*
+S <- &(A 'c') 'a'+ B !.
+A <- 'a' A? 'b'
+B <- 'b' B? 'c'
+*/
+
+let s = begin:
+  open PEG::New()
+  
+  "S" <- and(nonterm("A") & char('c'))
+       & one_or_more(char('a'))
+       & nonterm("B")
+       & not(any_char)
+
+  "A" <- char('a')
+       & optional(nonterm("A"))
+       & char('b')
+
+  "B" <- char('b')
+       & optional(nonterm("B"))
+       & char('c')
+
+  nonterm("S")
+end
+
+assert(PEG::parse(s, "").failure?)
+assert(PEG::parse(s, "abc").success?)
+assert(PEG::parse(s, "aabbcc").success?)
+assert(PEG::parse(s, "aaabbbccc").success?)
+
+assert(PEG::parse(s, "aaabbcc").failure?)
+assert(PEG::parse(s, "aaabbbcc").failure?)
+assert(PEG::parse(s, "aabbbccc").failure?)
+assert(PEG::parse(s, "ababab").failure?)
+assert(PEG::parse(s, "aabbccdd").failure?)
+assert(PEG::parse(s, "ccbbaa").failure?)
+
+/*
+S <- E !.
+E <- T ('+' T)*
+T <- P ('*' P)*
+P <- [0123456789]+ / '(' E ')'
+*/
+
+let arith = begin:
+  open PEG::New()
+
+  "S" <- nonterm("E") & not(any_char)
+  "E" <- nonterm("T") & zero_or_more(char('+') & nonterm("T"))
+  "T" <- nonterm("P") & zero_or_more(char('*') & nonterm("P"))
+  "P" <- one_or_more(char_of("0123456789"))
+       | char('(') & nonterm("E") & char(')')
+
+  nonterm("S")
+end
+
+assert(PEG::parse(arith, "123").success?)
+assert(PEG::parse(arith, "1+2+3").success?)
+assert(PEG::parse(arith, "1*2*3").success?)
+assert(PEG::parse(arith, "1+2*3").success?)
+assert(PEG::parse(arith, "(1+2)*3").success?)
+
+assert(PEG::parse(arith, "1++").failure?)
+assert(PEG::parse(arith, "*3").failure?)
+assert(PEG::parse(arith, "(1+2*3").failure?)
+assert(PEG::parse(arith, "1+*3").failure?)
+assert(PEG::parse(arith, "1**3").failure?)
