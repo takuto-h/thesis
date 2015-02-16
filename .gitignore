@@ -7,7 +7,7 @@
 *.log
 *.synctex.gz
 *.xbb
-*.pdf
+#*.pdf
 .~lock.*
 *.lof
 *.toc
